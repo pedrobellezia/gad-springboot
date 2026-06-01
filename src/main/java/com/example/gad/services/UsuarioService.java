@@ -3,6 +3,7 @@ package com.example.gad.services;
 import java.util.List;
 import java.util.UUID;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.example.gad.models.Usuario;
@@ -18,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 public class UsuarioService {
 
     private final UsuarioRepository usuarioRepository;
+    private final PasswordEncoder passwordEncoder;
 
 
     public List<Usuario> findAll() {
@@ -32,10 +34,16 @@ public class UsuarioService {
                 ));
     }
 
+    public Usuario findByEmail(String email) {
+        return this.usuarioRepository.findByEmail(email)
+                .orElseThrow(() -> new ObjectNotFoundException("Usuario nao encontrado com email: " + email));
+    }
+
     @Transactional
     public Usuario create(Usuario obj) {
 
         obj.setId(null);
+        obj.setSenha(passwordEncoder.encode(obj.getSenha()));
 
         return this.usuarioRepository.save(obj);
     }
@@ -54,7 +62,7 @@ public class UsuarioService {
         }
 
         if (obj.getSenha() != null && !obj.getSenha().isBlank()) {
-            newObj.setSenha(obj.getSenha());
+            newObj.setSenha(passwordEncoder.encode(obj.getSenha()));
         }
 
         if (obj.getAvatar() != null) {

@@ -6,6 +6,7 @@ import java.util.UUID;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -29,6 +30,7 @@ public class ClienteController {
     private final PostService postService;
 
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<Cliente>> findAll() {
 
         return ResponseEntity.ok(
@@ -37,6 +39,7 @@ public class ClienteController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN') or @clienteService.findById(#id).getUsuario().getEmail() == authentication.name")
     public ResponseEntity<Cliente> findById(
             @PathVariable UUID id
     ) {
@@ -47,6 +50,7 @@ public class ClienteController {
     }
 
     @GetMapping("/{id}/posts")
+    @PreAuthorize("hasRole('ADMIN') or @clienteService.findById(#id).getUsuario().getEmail() == authentication.name")
     public ResponseEntity<List<Post>> findAllPostsByClienteId(
             @PathVariable UUID id
     ) {
@@ -57,6 +61,7 @@ public class ClienteController {
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Cliente> create(
             @Valid @RequestBody Cliente obj
     ) {
@@ -73,8 +78,9 @@ public class ClienteController {
                 .created(uri)
                 .body(cliente);
     }
-
+    // ADMIN
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN') or @clienteService.findById(#id).getUsuario().getEmail() == authentication.name")
     public ResponseEntity<Cliente> update(
             @Valid @RequestBody Cliente obj,
             @PathVariable UUID id
@@ -88,6 +94,7 @@ public class ClienteController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> delete(
             @PathVariable UUID id
     ) {

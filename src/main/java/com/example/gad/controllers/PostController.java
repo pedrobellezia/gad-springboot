@@ -4,8 +4,7 @@ import java.net.URI;
 import java.util.List;
 import java.util.UUID;
 
-import lombok.Getter;
-import lombok.Setter;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -38,26 +37,31 @@ public class PostController {
     }
 
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN') or hasRole('REDATOR')")
     public ResponseEntity<List<Post>> findAll() {
         return ResponseEntity.ok(postService.findAll());
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('REDATOR') or @postService.findById(#id).getCliente().getUsuario().getEmail() == authentication.name")
     public ResponseEntity<Post> findById(@PathVariable UUID id) {
         return ResponseEntity.ok(postService.findById(id));
     }
 
     @GetMapping("/{id}/medias")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('REDATOR') or @postService.findById(#id).getCliente().getUsuario().getEmail() == authentication.name")
     public ResponseEntity<List<PostMedia>> findAllMediasByPostId(@PathVariable UUID id) {
         return ResponseEntity.ok(postMediaService.findAllByPostId(id));
     }
 
     @GetMapping("/{id}/comentarios")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('REDATOR') or @postService.findById(#id).getCliente().getUsuario().getEmail() == authentication.name")
     public ResponseEntity<List<Comentario>> findAllComentariosByPostId(@PathVariable UUID id) {
         return ResponseEntity.ok(comentarioService.findAllByPostId(id));
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN') or hasRole('REDATOR')")
     public ResponseEntity<Void> create(@RequestBody Post obj) {
 
         postService.create(obj);
@@ -72,6 +76,7 @@ public class PostController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('REDATOR')")
     public ResponseEntity<Void> update(@RequestBody Post obj, @PathVariable UUID id) {
 
         obj.setId(id);
@@ -81,6 +86,7 @@ public class PostController {
     }
 
     @PutMapping("/{id}/status")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('REDATOR') or @postService.findById(#id).getCliente().getUsuario().getEmail() == authentication.name")
     public ResponseEntity<Void> updateStatus(
             @PathVariable UUID id,
             @RequestBody PostStatusRequest body
@@ -90,6 +96,7 @@ public class PostController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('REDATOR')")
     public ResponseEntity<Void> delete(@PathVariable UUID id) {
         postService.delete(id);
         return ResponseEntity.noContent().build();

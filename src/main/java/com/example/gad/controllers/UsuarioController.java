@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -23,16 +24,19 @@ public class UsuarioController {
     }
 
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<Usuario>> findAll() {
         return ResponseEntity.ok(usuarioService.findAll());
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN') or @usuarioService.findById(#id).getEmail() == authentication.name")
     public ResponseEntity<Usuario> findById(@PathVariable UUID id) {
         return ResponseEntity.ok(usuarioService.findById(id));
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> create(@RequestBody Usuario obj) {
 
         usuarioService.create(obj);
@@ -47,6 +51,7 @@ public class UsuarioController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN') or @usuarioService.findById(#id).getEmail() == authentication.name")
     public ResponseEntity<Void> update(@RequestBody Usuario obj, @PathVariable UUID id) {
 
         obj.setId(id);
@@ -56,6 +61,7 @@ public class UsuarioController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> delete(@PathVariable UUID id) {
 
         usuarioService.delete(id);

@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,16 +25,19 @@ public class ComentarioController {
     }
 
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<Comentario>> findAll() {
         return ResponseEntity.ok(comentarioService.findAll());
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Comentario> findById(@PathVariable UUID id) {
         return ResponseEntity.ok(comentarioService.findById(id));
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN') or (hasRole('CLIENTE') and @postService.findById(#obj.post.id).getCliente().getUsuario().getEmail() == authentication.name) or (hasRole('REDATOR') and @postService.findById(#obj.post.id).getRedator().getUsuario().getEmail() == authentication.name)")
     public ResponseEntity<Void> create(
             @Validated(Comentario.CreateComentario.class)
             @RequestBody Comentario obj
@@ -51,6 +55,7 @@ public class ComentarioController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> update(
             @Validated(Comentario.UpdateComentario.class)
             @RequestBody Comentario obj,
@@ -65,6 +70,7 @@ public class ComentarioController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN') or @comentarioService.findById(#id).getUsuario().getEmail() == authentication.name")
     public ResponseEntity<Void> delete(@PathVariable UUID id) {
 
         comentarioService.delete(id);

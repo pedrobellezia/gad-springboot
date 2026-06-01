@@ -64,6 +64,10 @@ public class Usuario extends AuditableEntity {
     @NotBlank(groups = CreateUsuario.class)
     private String senha;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "role", length = 20, nullable = false)
+    private UsuarioRole role;
+
     @Column(name = "avatar")
     private String avatar;
 

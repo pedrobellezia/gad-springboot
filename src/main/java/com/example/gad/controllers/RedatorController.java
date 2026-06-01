@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -30,21 +31,25 @@ public class RedatorController {
     }
 
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<Redator>> findAll() {
         return ResponseEntity.ok(redatorService.findAll());
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN') or @redatorService.findById(#id).getUsuario().getEmail() == authentication.name")
     public ResponseEntity<Redator> findById(@PathVariable UUID id) {
         return ResponseEntity.ok(redatorService.findById(id));
     }
 
     @GetMapping("/{id}/posts")
+    @PreAuthorize("hasRole('ADMIN') or @redatorService.findById(#id).getUsuario().getEmail() == authentication.name")
     public ResponseEntity<List<Post>> findAllPostsByRedatorId(@PathVariable UUID id) {
         return ResponseEntity.ok(postService.findAllByRedator_Id(id));
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> create(@RequestBody Redator obj) {
 
         redatorService.create(obj);
@@ -59,6 +64,7 @@ public class RedatorController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN') or @redatorService.findById(#id).getUsuario().getEmail() == authentication.name")
     public ResponseEntity<Void> update(@RequestBody Redator obj, @PathVariable UUID id) {
 
         obj.setUsuarioId(id);
@@ -68,6 +74,7 @@ public class RedatorController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> delete(@PathVariable UUID id) {
 
         redatorService.delete(id);
