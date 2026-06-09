@@ -10,6 +10,9 @@ import org.springframework.stereotype.Service;
 
 import com.example.gad.models.Cliente;
 import com.example.gad.models.Usuario;
+import com.example.gad.models.dto.ClienteCreateDTO;
+import com.example.gad.models.dto.ClienteUpdateDTO;
+import com.example.gad.models.projection.ClienteProjection;
 import com.example.gad.repositories.ClienteRepository;
 import com.example.gad.services.exceptions.DataBindingViolationException;
 import com.example.gad.services.exceptions.ObjectNotFoundException;
@@ -23,8 +26,26 @@ public class ClienteService {
     private final ClienteRepository clienteRepository;
     private final UsuarioService usuarioService;
 
-    public List<Cliente> findAll() {
-        return clienteRepository.findAll();
+    public List<ClienteProjection> findAll() {
+        return clienteRepository.findAllProjectedBy();
+    }
+
+    public Cliente fromCreateDTO(ClienteCreateDTO dto) {
+        Cliente cliente = new Cliente();
+        cliente.setEmpresaId(dto.getEmpresaId());
+
+        Usuario usuario = new Usuario();
+        usuario.setId(dto.getUsuarioId());
+        cliente.setUsuario(usuario);
+
+        return cliente;
+    }
+
+    public Cliente fromUpdateDTO(ClienteUpdateDTO dto) {
+        Cliente cliente = new Cliente();
+        cliente.setUsuarioId(dto.getUsuarioId());
+        cliente.setEmpresaId(dto.getEmpresaId());
+        return cliente;
     }
 
     public Cliente findById(UUID id) {

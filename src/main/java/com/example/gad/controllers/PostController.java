@@ -14,9 +14,14 @@ import com.example.gad.models.Comentario;
 import com.example.gad.models.Post;
 import com.example.gad.models.PostMedia;
 import com.example.gad.models.PostStatus;
+import com.example.gad.models.dto.PostCreateDTO;
+import com.example.gad.models.dto.PostUpdateDTO;
+import com.example.gad.models.projection.PostProjection;
 import com.example.gad.services.ComentarioService;
 import com.example.gad.services.PostMediaService;
 import com.example.gad.services.PostService;
+
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/posts")
@@ -38,7 +43,7 @@ public class PostController {
 
     @GetMapping
     @PreAuthorize("hasRole('ADMIN') or hasRole('REDATOR')")
-    public ResponseEntity<List<Post>> findAll() {
+    public ResponseEntity<List<PostProjection>> findAll() {
         return ResponseEntity.ok(postService.findAll());
     }
 
@@ -62,14 +67,14 @@ public class PostController {
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN') or hasRole('REDATOR')")
-    public ResponseEntity<Void> create(@RequestBody Post obj) {
+    public ResponseEntity<Void> create(@Valid @RequestBody PostCreateDTO dto) {
 
-        postService.create(obj);
+        Post created = postService.create(postService.fromCreateDTO(dto));
 
         URI uri = ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .path("/{id}")
-                .buildAndExpand(obj.getId())
+                .buildAndExpand(created.getId())
                 .toUri();
 
         return ResponseEntity.created(uri).build();
@@ -77,10 +82,10 @@ public class PostController {
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN') or hasRole('REDATOR')")
-    public ResponseEntity<Void> update(@RequestBody Post obj, @PathVariable UUID id) {
+    public ResponseEntity<Void> update(@Valid @RequestBody PostUpdateDTO dto, @PathVariable UUID id) {
 
-        obj.setId(id);
-        postService.update(obj);
+        dto.setId(id);
+        postService.update(postService.fromUpdateDTO(dto));
 
         return ResponseEntity.noContent().build();
     }

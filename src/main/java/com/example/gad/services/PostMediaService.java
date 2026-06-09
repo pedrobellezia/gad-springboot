@@ -8,6 +8,9 @@ import org.springframework.stereotype.Service;
 
 import com.example.gad.models.Post;
 import com.example.gad.models.PostMedia;
+import com.example.gad.models.dto.PostMediaCreateDTO;
+import com.example.gad.models.dto.PostMediaUpdateDTO;
+import com.example.gad.models.projection.PostMediaProjection;
 import com.example.gad.repositories.PostMediaRepository;
 import com.example.gad.services.exceptions.DataBindingViolationException;
 import com.example.gad.services.exceptions.ObjectNotFoundException;
@@ -23,8 +26,8 @@ public class PostMediaService {
 
     private final PostService postService;
 
-    public List<PostMedia> findAll() {
-        return postMediaRepository.findAll();
+    public List<PostMediaProjection> findAll() {
+        return postMediaRepository.findAllProjectedBy();
     }
 
     public PostMedia findById(UUID id) {
@@ -35,8 +38,20 @@ public class PostMediaService {
                 ));
     }
 
-    public List<PostMedia> findAllByPostId(UUID postId) {
-        return postMediaRepository.findByPost_Id(postId);
+    public List<PostMediaProjection> findAllByPostId(UUID postId) {
+        return postMediaRepository.findProjectedByPost_Id(postId);
+    }
+
+    public PostMedia fromCreateDTO(PostMediaCreateDTO dto) {
+        PostMedia media = new PostMedia();
+        media.setPath(dto.getUrl());
+        media.setTipo(dto.getTipo());
+
+        Post post = new Post();
+        post.setId(dto.getPostId());
+        media.setPost(post);
+
+        return media;
     }
 
     @Transactional
@@ -58,16 +73,16 @@ public class PostMediaService {
     }
 
     @Transactional
-    public PostMedia update(PostMedia obj) {
+    public PostMedia update(UUID id, PostMediaUpdateDTO objDto) {
 
-        PostMedia newObj = findById(obj.getId());
+        PostMedia newObj = findById(id);
 
-        if (obj.getPath() != null) {
-            newObj.setPath(obj.getPath());
+        if (objDto.getUrl() != null) {
+            newObj.setPath(objDto.getUrl());
         }
 
-        if (obj.getTipo() != null) {
-            newObj.setTipo(obj.getTipo());
+        if (objDto.getTipo() != null) {
+            newObj.setTipo(objDto.getTipo());
         }
 
         return postMediaRepository.save(newObj);

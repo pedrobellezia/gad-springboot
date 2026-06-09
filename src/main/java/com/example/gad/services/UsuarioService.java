@@ -7,6 +7,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.example.gad.models.Usuario;
+import com.example.gad.models.dto.UsuarioCreateDTO;
+import com.example.gad.models.dto.UsuarioUpdateDTO;
+import com.example.gad.models.projection.UsuarioProjection;
 import com.example.gad.repositories.UsuarioRepository;
 import com.example.gad.services.exceptions.DataBindingViolationException;
 import com.example.gad.services.exceptions.ObjectNotFoundException;
@@ -22,8 +25,8 @@ public class UsuarioService {
     private final PasswordEncoder passwordEncoder;
 
 
-    public List<Usuario> findAll() {
-        return this.usuarioRepository.findAll();
+    public List<UsuarioProjection> findAll() {
+        return this.usuarioRepository.findAllProjectedBy();
     }
 
     public Usuario findById(UUID id) {
@@ -39,6 +42,11 @@ public class UsuarioService {
                 .orElseThrow(() -> new ObjectNotFoundException("Usuario nao encontrado com email: " + email));
     }
 
+    public UsuarioProjection findProjectedByEmail(String email) {
+        return this.usuarioRepository.findProjectedByEmail(email)
+                .orElseThrow(() -> new ObjectNotFoundException("Usuario nao encontrado com email: " + email));
+    }
+
     @Transactional
     public Usuario create(Usuario obj) {
 
@@ -46,6 +54,32 @@ public class UsuarioService {
         obj.setSenha(passwordEncoder.encode(obj.getSenha()));
 
         return this.usuarioRepository.save(obj);
+    }
+
+    /**
+     * Convert a create DTO into an entity. Service is responsible for wiring default values.
+     */
+    public Usuario fromCreateDTO(UsuarioCreateDTO dto) {
+        Usuario u = new Usuario();
+        u.setNome(dto.getNome());
+        u.setEmail(dto.getEmail());
+        u.setSenha(dto.getSenha());
+        u.setRole(dto.getRole());
+        u.setAvatar(dto.getAvatar());
+        return u;
+    }
+
+    /**
+     * Convert an update DTO into an entity. Fields that are null will be ignored by update().
+     */
+    public Usuario fromUpdateDTO(UsuarioUpdateDTO dto) {
+        Usuario u = new Usuario();
+        u.setId(dto.getId());
+        u.setNome(dto.getNome());
+        u.setEmail(dto.getEmail());
+        u.setSenha(dto.getSenha());
+        u.setAvatar(dto.getAvatar());
+        return u;
     }
 
     @Transactional

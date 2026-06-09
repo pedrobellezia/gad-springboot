@@ -10,7 +10,11 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.example.gad.models.PostMedia;
+import com.example.gad.models.dto.PostMediaCreateDTO;
+import com.example.gad.models.dto.PostMediaUpdateDTO;
+import com.example.gad.models.projection.PostMediaProjection;
 import com.example.gad.services.PostMediaService;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping({"/post-media", "/postmedia"})
@@ -23,7 +27,7 @@ public class PostMediaController {
     }
 
     @GetMapping
-    public ResponseEntity<List<PostMedia>> findAll() {
+    public ResponseEntity<List<PostMediaProjection>> findAll() {
         return ResponseEntity.ok(postMediaService.findAll());
     }
 
@@ -33,9 +37,10 @@ public class PostMediaController {
     }
 
     @PostMapping
-    public ResponseEntity<Void> create(@RequestBody PostMedia obj) {
+    public ResponseEntity<Void> create(@Valid @RequestBody PostMediaCreateDTO objDto) {
 
-        postMediaService.create(obj);
+        PostMedia obj = postMediaService.fromCreateDTO(objDto);
+        obj = postMediaService.create(obj);
 
         URI uri = ServletUriComponentsBuilder
                 .fromCurrentRequest()
@@ -47,10 +52,9 @@ public class PostMediaController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Void> update(@RequestBody PostMedia obj, @PathVariable UUID id) {
+    public ResponseEntity<Void> update(@Valid @RequestBody PostMediaUpdateDTO objDto, @PathVariable UUID id) {
 
-        obj.setId(id);
-        postMediaService.update(obj);
+        postMediaService.update(id, objDto);
 
         return ResponseEntity.noContent().build();
     }

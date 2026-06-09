@@ -8,6 +8,9 @@ import org.springframework.stereotype.Service;
 import com.example.gad.models.Comentario;
 import com.example.gad.models.Post;
 import com.example.gad.models.Usuario;
+import com.example.gad.models.dto.ComentarioCreateDTO;
+import com.example.gad.models.dto.ComentarioUpdateDTO;
+import com.example.gad.models.projection.ComentarioProjection;
 import com.example.gad.repositories.ComentarioRepository;
 import com.example.gad.services.exceptions.DataBindingViolationException;
 import com.example.gad.services.exceptions.ObjectNotFoundException;
@@ -25,8 +28,8 @@ public class ComentarioService {
 
     private final UsuarioService usuarioService;
 
-    public List<Comentario> findAll() {
-        return comentarioRepository.findAll();
+    public List<ComentarioProjection> findAll() {
+        return comentarioRepository.findAllProjectedBy();
     }
 
     public Comentario findById(UUID id) {
@@ -36,8 +39,23 @@ public class ComentarioService {
                 ));
     }
 
-    public List<Comentario> findAllByPostId(UUID postId) {
-        return comentarioRepository.findByPost_Id(postId);
+    public List<ComentarioProjection> findAllByPostId(UUID postId) {
+        return comentarioRepository.findProjectedByPost_Id(postId);
+    }
+
+    public Comentario fromCreateDTO(ComentarioCreateDTO dto) {
+        Comentario comentario = new Comentario();
+        comentario.setTexto(dto.getTexto());
+
+        Post post = new Post();
+        post.setId(dto.getPostId());
+        comentario.setPost(post);
+
+        Usuario usuario = new Usuario();
+        usuario.setId(dto.getUsuarioId());
+        comentario.setUsuario(usuario);
+
+        return comentario;
     }
 
     @Transactional
@@ -67,12 +85,12 @@ public class ComentarioService {
     }
 
     @Transactional
-    public Comentario update(Comentario obj) {
+    public Comentario update(UUID id, ComentarioUpdateDTO objDto) {
 
-        Comentario newObj = findById(obj.getId());
+        Comentario newObj = findById(id);
 
-        if (obj.getTexto() != null) {
-            newObj.setTexto(obj.getTexto());
+        if (objDto.getTexto() != null) {
+            newObj.setTexto(objDto.getTexto());
         }
 
         return comentarioRepository.save(newObj);

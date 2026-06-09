@@ -6,13 +6,16 @@ import java.util.UUID;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.example.gad.models.Comentario;
+import com.example.gad.models.dto.ComentarioCreateDTO;
+import com.example.gad.models.dto.ComentarioUpdateDTO;
+import com.example.gad.models.projection.ComentarioProjection;
 import com.example.gad.services.ComentarioService;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/comentarios")
@@ -26,7 +29,7 @@ public class ComentarioController {
 
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<List<Comentario>> findAll() {
+    public ResponseEntity<List<ComentarioProjection>> findAll() {
         return ResponseEntity.ok(comentarioService.findAll());
     }
 
@@ -37,13 +40,11 @@ public class ComentarioController {
     }
 
     @PostMapping
-    @PreAuthorize("hasRole('ADMIN') or (hasRole('CLIENTE') and @postService.findById(#obj.post.id).getCliente().getUsuario().getEmail() == authentication.name) or (hasRole('REDATOR') and @postService.findById(#obj.post.id).getRedator().getUsuario().getEmail() == authentication.name)")
-    public ResponseEntity<Void> create(
-            @Validated(Comentario.CreateComentario.class)
-            @RequestBody Comentario obj
-    ) {
+    @PreAuthorize("hasRole('ADMIN') or (hasRole('CLIENTE') and @postService.findById(#objDto.postId).getCliente().getUsuario().getEmail() == authentication.name) or (hasRole('REDATOR') and @postService.findById(#objDto.postId).getRedator().getUsuario().getEmail() == authentication.name)")
+    public ResponseEntity<Void> create(@Valid @RequestBody ComentarioCreateDTO objDto) {
 
-        comentarioService.create(obj);
+        Comentario obj = comentarioService.fromCreateDTO(objDto);
+        obj = comentarioService.create(obj);
 
         URI uri = ServletUriComponentsBuilder
                 .fromCurrentRequest()
@@ -56,15 +57,9 @@ public class ComentarioController {
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Void> update(
-            @Validated(Comentario.UpdateComentario.class)
-            @RequestBody Comentario obj,
-            @PathVariable UUID id
-    ) {
+    public ResponseEntity<Void> update(@Valid @RequestBody ComentarioUpdateDTO objDto, @PathVariable UUID id) {
 
-        obj.setId(id);
-
-        comentarioService.update(obj);
+        comentarioService.update(id, objDto);
 
         return ResponseEntity.noContent().build();
     }

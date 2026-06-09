@@ -12,7 +12,10 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.example.gad.models.Cliente;
-import com.example.gad.models.Post;
+import com.example.gad.models.dto.ClienteCreateDTO;
+import com.example.gad.models.dto.ClienteUpdateDTO;
+import com.example.gad.models.projection.ClienteProjection;
+import com.example.gad.models.projection.PostProjection;
 import com.example.gad.services.ClienteService;
 import com.example.gad.services.PostService;
 
@@ -31,7 +34,7 @@ public class ClienteController {
 
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<List<Cliente>> findAll() {
+    public ResponseEntity<List<ClienteProjection>> findAll() {
 
         return ResponseEntity.ok(
                 this.clienteService.findAll()
@@ -51,7 +54,7 @@ public class ClienteController {
 
     @GetMapping("/{id}/posts")
     @PreAuthorize("hasRole('ADMIN') or @clienteService.findById(#id).getUsuario().getEmail() == authentication.name")
-    public ResponseEntity<List<Post>> findAllPostsByClienteId(
+    public ResponseEntity<List<PostProjection>> findAllPostsByClienteId(
             @PathVariable UUID id
     ) {
 
@@ -63,10 +66,10 @@ public class ClienteController {
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Cliente> create(
-            @Valid @RequestBody Cliente obj
+            @Valid @RequestBody ClienteCreateDTO dto
     ) {
 
-        Cliente cliente = this.clienteService.create(obj);
+        Cliente cliente = this.clienteService.create(this.clienteService.fromCreateDTO(dto));
 
         URI uri = ServletUriComponentsBuilder
                 .fromCurrentRequest()
@@ -82,14 +85,14 @@ public class ClienteController {
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN') or @clienteService.findById(#id).getUsuario().getEmail() == authentication.name")
     public ResponseEntity<Cliente> update(
-            @Valid @RequestBody Cliente obj,
+            @Valid @RequestBody ClienteUpdateDTO dto,
             @PathVariable UUID id
     ) {
 
-        obj.setUsuarioId(id);
+        dto.setUsuarioId(id);
 
         return ResponseEntity.ok(
-                this.clienteService.update(obj)
+                this.clienteService.update(this.clienteService.fromUpdateDTO(dto))
         );
     }
 

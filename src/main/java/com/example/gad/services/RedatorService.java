@@ -7,6 +7,9 @@ import org.springframework.stereotype.Service;
 
 import com.example.gad.models.Redator;
 import com.example.gad.models.Usuario;
+import com.example.gad.models.dto.RedatorCreateDTO;
+import com.example.gad.models.dto.RedatorUpdateDTO;
+import com.example.gad.models.projection.RedatorProjection;
 import com.example.gad.repositories.RedatorRepository;
 import com.example.gad.services.exceptions.DataBindingViolationException;
 import com.example.gad.services.exceptions.ObjectNotFoundException;
@@ -22,8 +25,8 @@ public class RedatorService {
 
     private final UsuarioService usuarioService;
 
-    public List<Redator> findAll() {
-        return this.redatorRepository.findAll();
+    public List<RedatorProjection> findAll() {
+        return this.redatorRepository.findAllProjectedBy();
     }
 
     public Redator findById(UUID id) {
@@ -32,6 +35,15 @@ public class RedatorService {
                 .orElseThrow(() -> new ObjectNotFoundException(
                         "Redator nao encontrado! Id: " + id
                 ));
+    }
+
+    public Redator fromDTO(RedatorCreateDTO objDto) {
+        Redator redator = new Redator();
+        Usuario usuario = new Usuario();
+        usuario.setId(objDto.getUsuarioId());
+        redator.setUsuario(usuario);
+        redator.setEmpresaId(objDto.getEmpresaId());
+        return redator;
     }
 
     @Transactional
@@ -54,12 +66,12 @@ public class RedatorService {
     }
 
     @Transactional
-    public Redator update(Redator obj) {
+    public Redator update(UUID id, RedatorUpdateDTO objDto) {
 
-        Redator newObj = findById(obj.getUsuarioId());
+        Redator newObj = findById(id);
 
-        if (obj.getEmpresaId() != null) {
-            newObj.setEmpresaId(obj.getEmpresaId());
+        if (objDto.getEmpresaId() != null) {
+            newObj.setEmpresaId(objDto.getEmpresaId());
         }
 
         return this.redatorRepository.save(newObj);

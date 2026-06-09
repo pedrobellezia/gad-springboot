@@ -6,10 +6,13 @@ import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.example.gad.models.Post;
+import com.example.gad.models.projection.PostProjection;
 
 public interface PostRepository extends JpaRepository<Post, UUID> {
 
-    List<Post> findByCliente_UsuarioId(UUID clienteId);
+    List<PostProjection> findAllProjectedBy();
 
-    List<Post> findByRedator_UsuarioId(UUID redatorId);
+    List<PostProjection> findProjectedByCliente_UsuarioId(UUID clienteId);
+
+    List<PostProjection> findProjectedByRedator_UsuarioId(UUID redatorId);
 }

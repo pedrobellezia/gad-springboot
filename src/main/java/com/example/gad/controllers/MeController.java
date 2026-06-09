@@ -1,5 +1,8 @@
 package com.example.gad.controllers;
 
+import com.example.gad.models.dto.UsuarioUpdateDTO;
+import com.example.gad.models.projection.UsuarioProjection;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -22,20 +25,21 @@ public class MeController {
     private final UsuarioService usuarioService;
 
     @GetMapping
-    public ResponseEntity<Usuario> me(@AuthenticationPrincipal UserDetails userDetails) {
+    public ResponseEntity<UsuarioProjection> me(@AuthenticationPrincipal UserDetails userDetails) {
         String email = userDetails.getUsername();
-        Usuario usuario = usuarioService.findByEmail(email);
+        UsuarioProjection usuario = usuarioService.findProjectedByEmail(email);
         return ResponseEntity.ok(usuario);
     }
 
     @PutMapping
-    public ResponseEntity<Void> updateMe(@AuthenticationPrincipal UserDetails userDetails,
-                                         @RequestBody Usuario update) {
+    public ResponseEntity<Void> updateMe(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @Valid @RequestBody UsuarioUpdateDTO dto
+    ) {
         String email = userDetails.getUsername();
         Usuario current = usuarioService.findByEmail(email);
-        update.setId(current.getId());
-        usuarioService.update(update);
+        dto.setId(current.getId());
+        usuarioService.update(usuarioService.fromUpdateDTO(dto));
         return ResponseEntity.noContent().build();
     }
 }
-

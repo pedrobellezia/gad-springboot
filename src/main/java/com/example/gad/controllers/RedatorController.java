@@ -4,14 +4,18 @@ import java.net.URI;
 import java.util.List;
 import java.util.UUID;
 
+import jakarta.validation.Valid;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import com.example.gad.models.Post;
 import com.example.gad.models.Redator;
+import com.example.gad.models.dto.RedatorCreateDTO;
+import com.example.gad.models.dto.RedatorUpdateDTO;
+import com.example.gad.models.projection.PostProjection;
+import com.example.gad.models.projection.RedatorProjection;
 import com.example.gad.services.PostService;
 import com.example.gad.services.RedatorService;
 
@@ -32,7 +36,7 @@ public class RedatorController {
 
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<List<Redator>> findAll() {
+    public ResponseEntity<List<RedatorProjection>> findAll() {
         return ResponseEntity.ok(redatorService.findAll());
     }
 
@@ -44,15 +48,16 @@ public class RedatorController {
 
     @GetMapping("/{id}/posts")
     @PreAuthorize("hasRole('ADMIN') or @redatorService.findById(#id).getUsuario().getEmail() == authentication.name")
-    public ResponseEntity<List<Post>> findAllPostsByRedatorId(@PathVariable UUID id) {
+    public ResponseEntity<List<PostProjection>> findAllPostsByRedatorId(@PathVariable UUID id) {
         return ResponseEntity.ok(postService.findAllByRedator_Id(id));
     }
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Void> create(@RequestBody Redator obj) {
+    public ResponseEntity<Void> create(@Valid @RequestBody RedatorCreateDTO objDto) {
 
-        redatorService.create(obj);
+        Redator obj = redatorService.fromDTO(objDto);
+        obj = redatorService.create(obj);
 
         URI uri = ServletUriComponentsBuilder
                 .fromCurrentRequest()
@@ -65,10 +70,9 @@ public class RedatorController {
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN') or @redatorService.findById(#id).getUsuario().getEmail() == authentication.name")
-    public ResponseEntity<Void> update(@RequestBody Redator obj, @PathVariable UUID id) {
+    public ResponseEntity<Void> update(@Valid @RequestBody RedatorUpdateDTO objDto, @PathVariable UUID id) {
 
-        obj.setUsuarioId(id);
-        redatorService.update(obj);
+        redatorService.update(id, objDto);
 
         return ResponseEntity.noContent().build();
     }

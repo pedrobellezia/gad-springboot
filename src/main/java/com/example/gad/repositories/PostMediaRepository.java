@@ -6,8 +6,11 @@ import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.example.gad.models.PostMedia;
+import com.example.gad.models.projection.PostMediaProjection;
 
 public interface PostMediaRepository extends JpaRepository<PostMedia, UUID> {
 
-    List<PostMedia> findByPost_Id(UUID postId);
+    List<PostMediaProjection> findProjectedByPost_Id(UUID postId);
+
+    List<PostMediaProjection> findAllProjectedBy();
 }

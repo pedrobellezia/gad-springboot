@@ -9,6 +9,9 @@ import com.example.gad.models.Cliente;
 import com.example.gad.models.Post;
 import com.example.gad.models.PostStatus;
 import com.example.gad.models.Redator;
+import com.example.gad.models.dto.PostCreateDTO;
+import com.example.gad.models.dto.PostUpdateDTO;
+import com.example.gad.models.projection.PostProjection;
 import com.example.gad.repositories.PostRepository;
 import com.example.gad.services.exceptions.DataBindingViolationException;
 import com.example.gad.services.exceptions.ObjectNotFoundException;
@@ -26,8 +29,8 @@ public class PostService {
 
     private final RedatorService redatorService;
 
-    public List<Post> findAll() {
-        return this.postRepository.findAll();
+    public List<PostProjection> findAll() {
+        return this.postRepository.findAllProjectedBy();
     }
 
     public Post findById(UUID id) {
@@ -37,12 +40,51 @@ public class PostService {
                 ));
     }
 
-    public List<Post> findAllByCliente_Id(UUID clienteId) {
-        return this.postRepository.findByCliente_UsuarioId(clienteId);
+    public List<PostProjection> findAllByCliente_Id(UUID clienteId) {
+        return this.postRepository.findProjectedByCliente_UsuarioId(clienteId);
     }
 
-    public List<Post> findAllByRedator_Id(UUID redatorId) {
-        return this.postRepository.findByRedator_UsuarioId(redatorId);
+    public List<PostProjection> findAllByRedator_Id(UUID redatorId) {
+        return this.postRepository.findProjectedByRedator_UsuarioId(redatorId);
+    }
+
+    public Post fromCreateDTO(PostCreateDTO dto) {
+        Post post = new Post();
+        post.setConteudo(dto.getConteudo());
+        post.setStatus(dto.getStatus());
+        post.setHash(dto.getHash());
+
+        Cliente cliente = new Cliente();
+        cliente.setUsuarioId(dto.getClienteId());
+        post.setCliente(cliente);
+
+        Redator redator = new Redator();
+        redator.setUsuarioId(dto.getRedatorId());
+        post.setRedator(redator);
+
+        return post;
+    }
+
+    public Post fromUpdateDTO(PostUpdateDTO dto) {
+        Post post = new Post();
+        post.setId(dto.getId());
+        post.setConteudo(dto.getConteudo());
+        post.setStatus(dto.getStatus());
+        post.setHash(dto.getHash());
+
+        if (dto.getClienteId() != null) {
+            Cliente cliente = new Cliente();
+            cliente.setUsuarioId(dto.getClienteId());
+            post.setCliente(cliente);
+        }
+
+        if (dto.getRedatorId() != null) {
+            Redator redator = new Redator();
+            redator.setUsuarioId(dto.getRedatorId());
+            post.setRedator(redator);
+        }
+
+        return post;
     }
 
     private UUID resolveClienteId(Cliente cliente) {

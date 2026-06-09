@@ -11,7 +11,11 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.example.gad.models.Usuario;
+import com.example.gad.models.dto.UsuarioCreateDTO;
+import com.example.gad.models.dto.UsuarioUpdateDTO;
+import com.example.gad.models.projection.UsuarioProjection;
 import com.example.gad.services.UsuarioService;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/usuarios")
@@ -25,7 +29,7 @@ public class UsuarioController {
 
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<List<Usuario>> findAll() {
+    public ResponseEntity<List<UsuarioProjection>> findAll() {
         return ResponseEntity.ok(usuarioService.findAll());
     }
 
@@ -37,14 +41,14 @@ public class UsuarioController {
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Void> create(@RequestBody Usuario obj) {
+    public ResponseEntity<Void> create(@Valid @RequestBody UsuarioCreateDTO dto) {
 
-        usuarioService.create(obj);
+        Usuario created = usuarioService.create(usuarioService.fromCreateDTO(dto));
 
         URI uri = ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .path("/{id}")
-                .buildAndExpand(obj.getId())
+                .buildAndExpand(created.getId())
                 .toUri();
 
         return ResponseEntity.created(uri).build();
@@ -52,10 +56,10 @@ public class UsuarioController {
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN') or @usuarioService.findById(#id).getEmail() == authentication.name")
-    public ResponseEntity<Void> update(@RequestBody Usuario obj, @PathVariable UUID id) {
+    public ResponseEntity<Void> update(@Valid @RequestBody UsuarioUpdateDTO dto, @PathVariable UUID id) {
 
-        obj.setId(id);
-        usuarioService.update(obj);
+        dto.setId(id);
+        usuarioService.update(usuarioService.fromUpdateDTO(dto));
 
         return ResponseEntity.noContent().build();
     }
