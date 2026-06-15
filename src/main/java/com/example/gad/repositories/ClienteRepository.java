@@ -1,5 +1,6 @@
 package com.example.gad.repositories;
 
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -14,4 +15,6 @@ public interface ClienteRepository extends JpaRepository<Cliente, UUID> {
     boolean existsByEmpresaId(String empresaId);
 
     List<ClienteProjection> findAllProjectedBy();
+
+    Optional<Cliente> findByUsuarioEmail(String email);
 }

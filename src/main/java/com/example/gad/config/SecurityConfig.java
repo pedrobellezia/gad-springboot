@@ -36,6 +36,34 @@ public class SecurityConfig {
 
     private static final String[] PUBLIC_MATCHERS = {
             "/",
+            "/index.html",
+            "/login",
+            "/login.html",
+            "/register",
+            "/register.html",
+            "/recuperar_senha",
+            "/recuperar_senha.html",
+            "/trocar_senha",
+            "/trocar_senha.html",
+            "/painel_cliente",
+            "/painel_cliente.html",
+            "/painel_redator",
+            "/painel_redator.html",
+            "/postagens_cliente",
+            "/postagens_cliente.html",
+            "/config",
+            "/config.html",
+            "/perfil_cliente",
+            "/perfil_cliente.html",
+            "/perfil_redator",
+            "/perfil_redator.html",
+            "/cliente_convite",
+            "/cliente_convite.html",
+            "/redator_convite",
+            "/redator_convite.html",
+            "/token_check",
+            "/token_check.html",
+            "/static/**",
             "/h2-console/**",
             "/swagger-ui/**",
             "/v3/api-docs/**"
@@ -69,6 +97,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.applyPermitDefaultValues();
+        configuration.addExposedHeader("Location");
         configuration.setAllowedMethods(Arrays.asList("POST", "GET", "PUT", "DELETE", "OPTIONS"));
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

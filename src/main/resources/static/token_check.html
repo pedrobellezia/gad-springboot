@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Recuperar Senha</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/css/login_cadastro.css">
+    <link rel="icon" type="image/png" sizes="16x16" href="/static/img/assets/fav_icon.png">
+</head>
+<body>
+    <div class="container">
+        <div class="left"></div>
+        <div class="right">
+            <form id="tokenForm">
+                <div id="errorCard" class="error-card" style="display: none;"></div>
+                <h2>Verificar Token</h2>
+                <p class="sub">Digite o Token enviado para seu email de recuperação.</p>
+                <label for="token">Token</label>
+                <input type="text" name="token" id="token" placeholder="Insira o Token..." required>
+
+                <button type="submit">Verificar Token</button>                
+            </form>
+        </div>
+    </div>
+    <script>
+        document.getElementById('tokenForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            // Simular token válido e redirecionar
+            window.location.href = '/trocar_senha';
+        });
+    </script>
+</body>
+</html>

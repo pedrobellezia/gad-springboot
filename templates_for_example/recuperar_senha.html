@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Recuperar Senha</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/css/login_cadastro.css">
+    <link rel="icon" type="image/png" sizes="16x16" href="/static/img/assets/fav_icon.png">
+</head>
+<body>
+    <div class="container">
+        <div class="left"></div>
+        <div class="right">
+            <form action="/processar_recuperacao" method="POST">
+                {% if erro %}
+                    <div class="error-card">{{erro}}</div>
+                {% endif %}
+                <h2>Recuperar Senha</h2>
+                <p class="sub">Digite seu e-mail e o tipo de conta para enviarmos um link de recuperação.</p>
+                <label for="email">Email</label>
+                <input type="email" name="email" placeholder="Digite o e-mail da sua conta" required>
+                <input type="hidden" name="csrf_token" value="{{ request.session.get('CSRF_token') }}">
+
+                <button type="submit">Gerar Link de Recuperação</button>
+                 <div class="link">
+                    <p>Lembrou a senha? <a href="/login">Faça login</a></p>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

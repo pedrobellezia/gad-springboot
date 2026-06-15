@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Perfil</title>
+    <link rel="icon" type="image/png" sizes="16x16" href="/static/img/assets/fav_icon.png">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600&display=swap"
+          rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded" rel="stylesheet"/>
+    <link rel="stylesheet" href="/static/css/painel_gestor.css">
+    <link rel="stylesheet" href="/static/css/sidebar.css">
+    <link rel="stylesheet" href="/static/css/profile.css">
+    <link rel="stylesheet" href="/static/css/responsividade.css">
+    <link rel="stylesheet" href="/static/css/error_popup.css">
+</head>
+
+<body>
+
+<div class="container">
+    <aside class="sidebar expanded" id="sidebar">
+        <div class="logo">
+            <img src="/static/img/assets/logo_GAD_PAINEL.png" alt="Logo" style="width: 80%; height: auto;"/>
+        </div>
+        <nav class="menu-wrapper">
+            <div class="menu">
+                <a href="/painel_cliente" class="menu-item"><span
+                        class="material-symbols-rounded">space_dashboard</span><span
+                        class="text">Postagens</span></a>
+                <a href="/cliente_convite" class="menu-item"><span
+                        class="material-symbols-rounded">forward_to_inbox</span><span
+                        class="text">Convites</span></a>
+                <a href="/perfil_cliente" class="menu-item active"><span class="material-symbols-rounded">Person</span><span
+                        class="text">Perfil</span></a>
+                <a href="/config" class="menu-item"><span
+                        class="material-symbols-rounded">settings</span><span class="text">Configurações</span></a>
+            </div>
+            <div style="margin-top: auto; width: 100%;">
+                <a href="javascript:void(0);" id="logoutBtn" class="menu-item logout">
+                    <span class="material-symbols-rounded">exit_to_app</span>
+                    <span class="text">Sair</span>
+                </a>
+            </div>
+        </nav>
+    </aside>
+
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    <main class="main-content">
+        <header class="header">
+            <button id="toggleBtn" class="toggle-btn">
+                <span class="material-symbols-rounded" id="iconToggle">chevron_left</span>
+            </button>
+            <h1>Perfil</h1>
+            <div class="user-info">
+                <span id="headerUserName">Carregando...</span>
+                <img id="headerUserAvatar" src="/static/img/assets/logo_GAD_HOME.png" alt="Avatar do Usuario" class="avatar">
+            </div>
+        </header>
+
+        <div class="profile-container">
+            <div class="profile-card">
+                <div class="profile-header">
+                    <a href="javascript:void(0);" onclick="abrirModal()" title="Trocar Foto do Perfil"
+                       class="avatar-link">
+                        <img id="profileAvatar" src="/static/img/assets/logo_GAD_HOME.png" alt="Avatar do Usuario"
+                             class="profile-avatar">
+                    </a>
+                    <div class="profile-info">
+                        <h2 id="profileName">Carregando...</h2>
+                        <p id="profileEmail">Carregando...</p>
+                        <span class="badge">Cliente</span>
+                    </div>
+                </div>
+
+                <div class="profile-details">
+                    <h3>Meu Vínculo</h3>
+                    <div class="details-grid">
+                        <div class="detail-item">
+                            <p><strong>Código da Empresa:</strong> <span id="profileEmpresaId">Carregando...</span></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<div id="avatarUploadModal" class="upload-modal-overlay">
+    <div class="upload-modal-content">
+        <button class="upload-modal-fechar" onclick="fecharModal()">
+            <span class="material-symbols-rounded">close</span>
+        </button>
+
+        <div class="upload-modal-header">
+            <div class="icon-wrapper">
+                <span class="material-symbols-rounded">upload_file</span>
+            </div>
+            <h2>Alterar Foto do Perfil</h2>
+            <p>Escolha uma imagem (JPG, PNG) de até 2MB.</p>
+        </div>
+
+        <form id="avatarUploadForm">
+            <input type="file" id="avatarFile" name="file" required accept="image/jpeg, image/png">
+            <div class="upload-modal-botoes">
+                <button type="button" class="upload-modal-btn-secundario" onclick="fecharModal()">Cancelar</button>
+                <button type="submit" class="upload-modal-btn-primario">Salvar Foto</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="/static/js/sidebar.js"></script>
+<script>
+    const token = localStorage.getItem('token');
+    if (!token) {
+        window.location.href = '/login';
+    }
+
+    const modal = document.getElementById('avatarUploadModal');
+
+    function abrirModal() {
+        modal.classList.add('visible');
+    }
+
+    function fecharModal() {
+        modal.classList.remove('visible');
+    }
+
+    // Fechar o modal clicando fora dele
+    modal.addEventListener('click', function (event) {
+        if (event.target === modal) {
+            fecharModal();
+        }
+    });
+
+    // Helper para URL do avatar
+    function getAvatarUrl(avatar) {
+        if (!avatar || avatar === 'None' || avatar === 'icon_padrao.png') {
+            return '/static/img/assets/logo_GAD_HOME.png'; 
+        }
+        if (avatar.startsWith('http://') || avatar.startsWith('https://')) {
+            return avatar;
+        }
+        return '/static/uploads/' + avatar;
+    }
+
+    // Carregar informações do perfil
+    let currentUser = null;
+    async function loadProfile() {
+        try {
+            const resMe = await fetch('/me', {
+                headers: { 'Authorization': 'Bearer ' + token }
+            });
+
+            if (!resMe.ok) {
+                localStorage.removeItem('token');
+                window.location.href = '/login';
+                return;
+            }
+
+            currentUser = await resMe.ok ? await resMe.json() : null;
+            if (!currentUser) return;
+
+            document.getElementById('headerUserName').textContent = currentUser.nome;
+            document.getElementById('profileName').textContent = currentUser.nome;
+            document.getElementById('profileEmail').textContent = currentUser.email;
+
+            const avatarUrl = getAvatarUrl(currentUser.avatar);
+            document.getElementById('headerUserAvatar').src = avatarUrl;
+            document.getElementById('profileAvatar').src = avatarUrl;
+
+            // Fetch Cliente specific details
+            const resCliente = await fetch('/cliente/' + currentUser.id, {
+                headers: { 'Authorization': 'Bearer ' + token }
+            });
+
+            if (resCliente.ok) {
+                const clienteData = await resCliente.json();
+                document.getElementById('profileEmpresaId').textContent = clienteData.empresaId || 'Sem vínculo';
+            } else {
+                document.getElementById('profileEmpresaId').textContent = 'Erro ao carregar';
+            }
+
+        } catch (err) {
+            console.error('Erro ao carregar perfil:', err);
+            showErrorPopup('Erro ao carregar informações do perfil.');
+        }
+    }
+
+    // Upload de avatar
+    document.getElementById('avatarUploadForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const fileInput = document.getElementById('avatarFile');
+        if (fileInput.files.length === 0) return;
+
+        const formData = new FormData();
+        formData.append('file', fileInput.files[0]);
+
+        try {
+            // Upload do arquivo
+            const uploadRes = await fetch('/upload', {
+                method: 'POST',
+                headers: { 'Authorization': 'Bearer ' + token },
+                body: formData
+            });
+
+            if (!uploadRes.ok) {
+                showErrorPopup('Erro ao fazer upload da imagem.');
+                return;
+            }
+
+            const uploadResult = await uploadRes.json();
+            const filename = uploadResult.filename;
+
+            // Atualizar perfil do usuario
+            const updateRes = await fetch('/me', {
+                method: 'PUT',
+                headers: { 
+                    'Authorization': 'Bearer ' + token,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    nome: currentUser.nome,
+                    email: currentUser.email,
+                    avatar: filename
+                })
+            });
+
+            if (updateRes.ok) {
+                fecharModal();
+                loadProfile();
+            } else {
+                showErrorPopup('Erro ao atualizar imagem no perfil.');
+            }
+
+        } catch (err) {
+            console.error('Erro no upload de avatar:', err);
+            showErrorPopup('Erro de conexão ao enviar imagem.');
+        }
+    });
+
+    // Logout
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        window.location.href = '/login';
+    });
+
+    // Função auxiliar para mostrar popup de erro dinâmico
+    function showErrorPopup(message) {
+        let errorPopup = document.getElementById('dynamicErrorPopup');
+
+        if (!errorPopup) {
+            errorPopup = document.createElement('div');
+            errorPopup.id = 'dynamicErrorPopup';
+            errorPopup.className = 'popup-overlay';
+            errorPopup.innerHTML = `
+                <div class="popup-container">
+                    <div class="popup-icon">
+                        <svg viewBox="0 0 24 24" fill="none">
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                        </svg>
+                    </div>
+                    <p class="popup-message" id="dynamicErrorMessage"></p>
+                    <button id="closeErrorButton" class="popup-button">OK</button>
+                </div>
+            `;
+            document.body.appendChild(errorPopup);
+        }
+
+        const messageElement = errorPopup.querySelector('#dynamicErrorMessage');
+        const closeButton = errorPopup.querySelector('#closeErrorButton');
+
+        messageElement.textContent = message;
+        errorPopup.classList.remove('hidden');
+
+        closeButton.onclick = () => {
+            errorPopup.classList.add('hidden');
+        };
+
+        errorPopup.onclick = (e) => {
+            if (e.target === errorPopup) {
+                errorPopup.classList.add('hidden');
+            }
+        };
+    }
+
+    loadProfile();
+</script>
+</body>
+
+</html>

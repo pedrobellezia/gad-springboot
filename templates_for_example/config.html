@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Configurações</title>
+    <link rel="icon" type="image/png" sizes="16x16" href="/static/img/assets/fav_icon.png">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded" rel="stylesheet" />
+    <link rel="stylesheet" href="/static/css/painel_gestor.css">
+    <link rel="stylesheet" href="/static/css/sidebar.css">
+    <link rel="stylesheet" href="/static/css/profile.css">
+    <link rel="stylesheet" href="/static/css/responsividade.css">
+    <style>
+        :root {
+            --cor-primaria: #843af3;
+            --cor-secundaria: #4ce68b;
+            --cor-perigo-fundo: #ef4444;
+            --cor-perigo-fundo-hover: #dc2626;
+            --cor-perigo-texto: #ffffff;
+            --cor-perigo-borda-icone: #f8b4b4;
+            --cor-perigo-icone: #ef4444;
+            --cor-cancelar-fundo: #e5e7eb;
+            --cor-cancelar-fundo-hover: #d1d5db;
+            --cor-cancelar-texto: #374151;
+        }
+
+        * {
+            letter-spacing: 0.001rem;
+        }
+
+        /* --- MELHORIAS GERAIS E CARDS --- */
+        .content-body {
+            padding: 1.5rem 2rem;
+        }
+
+        .settings-card {
+            background-color: #fff;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            margin-bottom: 2rem;
+        }
+
+        .settings-card h2 {
+            margin-top: 0;
+            margin-bottom: 20px;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #333;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+
+        /* --- MELHORIAS NO FORMULÁRIO --- */
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+            color: #4a5568;
+            font-size: 0.9rem;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 1rem;
+            box-sizing: border-box;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .form-group input:focus,
+        .form-group input:focus-visible {
+            outline: none;
+            border-color: var(--cor-primaria);
+            box-shadow: 0 0 0 3px rgba(132, 58, 243, 0.2);
+        }
+
+        /* --- MELHORIAS NOS BOTÕES --- */
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 700;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+            transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-primary {
+            background-color: var(--cor-primaria);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #4ce68b;
+        }
+
+        .btn-danger {
+            background-color: var(--cor-perigo-fundo);
+            color: white;
+            margin-top: 1rem;
+        }
+
+        .btn-danger:hover {
+            background-color: var(--cor-perigo-fundo-hover);
+        }
+
+        /* --- ZONA DE PERIGO --- */
+        .danger-zone {
+            border-left: 4px solid var(--cor-perigo-fundo);
+            background-color: #fff5f5;
+            padding: 20px;
+        }
+
+        .danger-zone p {
+            margin-top: 0;
+            color: #58151c;
+        }
+
+        /* --- MENSAGENS DE FEEDBACK --- */
+        .mensagem {
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            color: #fff;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .mensagem-sucesso {
+            background-color: #4ce68b;
+        }
+
+        .mensagem-erro {
+            background-color: #ef4444;
+        }
+
+        /* --- POPUP DE EXCLUSÃO --- */
+        .popupdelete-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(17, 24, 39, 0.6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1002;
+            visibility: hidden;
+            opacity: 0;
+            transition: opacity 0.3s ease, visibility 0s 0.3s;
+        }
+
+        .popupdelete-overlay.popupdelete-visivel {
+            visibility: visible;
+            opacity: 1;
+            transition: opacity 0.3s ease;
+        }
+
+        .popupdelete-conteudo {
+            background: #ffffff;
+            padding: 32px;
+            border-radius: 16px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            width: 90%;
+            max-width: 400px;
+            position: relative;
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+        }
+
+        .popupdelete-overlay.popupdelete-visivel .popupdelete-conteudo {
+            transform: scale(1);
+        }
+
+        .popupdelete-fechar {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #9ca3af;
+            padding: 0;
+            display: flex;
+            transition: color 0.5s ease;
+        }
+
+        .popupdelete-fechar:hover {
+            color: #656668;
+        }
+
+        .popupdelete-fechar .material-symbols-rounded {
+            font-size: 28px;
+        }
+
+        .popupdelete-icone {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 16px auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .popupdelete-cor-icone-perigo {
+            border: 4px solid var(--cor-perigo-borda-icone);
+            border-radius: 50%;
+            color: var(--cor-perigo-icone);
+        }
+
+        .popupdelete-icone .material-symbols-rounded {
+            font-size: 85px;
+            font-variation-settings: 'FILL' 1;
+        }
+
+        .popupdelete-conteudo h2 {
+            margin-top: 0;
+            margin-bottom: 8px;
+            color: #111827;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-weight: 700;
+            font-size: 1.5rem;
+        }
+
+        .popupdelete-conteudo p {
+            margin-top: 0;
+            margin-bottom: 24px;
+            color: #6b7280;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            line-height: 1.5;
+        }
+
+        .popupdelete-botoes {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+        }
+
+        .popupdelete-botao-cancelar {
+            background-color: var(--cor-cancelar-fundo);
+            color: var(--cor-cancelar-texto);
+        }
+
+        .popupdelete-botao-cancelar:hover {
+            background-color: var(--cor-cancelar-fundo-hover);
+        }
+
+        .popupdelete-cor-botao-perigo {
+            background-color: var(--cor-perigo-fundo);
+            color: var(--cor-perigo-texto);
+        }
+
+        .popupdelete-cor-botao-perigo:hover {
+            background-color: var(--cor-perigo-fundo-hover);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <aside class="sidebar expanded" id="sidebar">
+            <div class="logo">
+                <img src="/static/img/assets/logo_GAD_PAINEL.png" alt="Logo" style="width: 80%; height: auto;" />
+            </div>
+            <nav class="menu-wrapper">
+                <div class="menu">
+                    <a href="/dashboard" class="menu-item"><span class="material-symbols-rounded">space_dashboard</span><span class="text">Postagens</span></a>
+                    <a href="/convites" class="menu-item"><span class="material-symbols-rounded">forward_to_inbox</span><span class="text">Convites</span></a>
+                    <a href="/perfil" class="menu-item"><span class="material-symbols-rounded">Person</span><span class="text">Perfil</span></a>
+                    <a href="/config" class="menu-item active"><span class="material-symbols-rounded">settings</span><span class="text">Configurações</span></a>
+                </div>
+                <div style="margin-top: auto; width: 100%;">
+                    <a href="/logout" class="menu-item logout">
+                        <span class="material-symbols-rounded">exit_to_app</span>
+                        <span class="text">Sair</span>
+                    </a>
+                </div>
+            </nav>
+        </aside>
+
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
+        <main class="main-content">
+            <header class="header">
+                <button id="toggleBtn" class="toggle-btn">
+                    <span class="material-symbols-rounded" id="iconToggle">chevron_left</span>
+                </button>
+                <h1>Configurações</h1>
+                <div class="user-info">
+                <span>{{ usuario.nome }}</span>
+
+                {% if usuario.avatar and usuario.avatar|length > 4 and usuario.avatar != "None" and usuario.avatar != "icon_padrao.png" %}
+                    <img src="{{ usuario.avatar }}" alt="Avatar" class="avatar">
+                {% else %}
+                    <img src="https://ui-avatars.com/api/?name={{ usuario.nome }}&background=843af3&color=fff&size=128" alt="Avatar" class="avatar">
+                {% endif %}
+            </div>
+            </header>
+
+            <div class="content-body">
+                {% if success %}
+                <div class="mensagem mensagem-sucesso">{{ success }}</div>
+                {% endif %}
+                {% if error %}
+                <div class="mensagem mensagem-erro">{{ error }}</div>
+                {% endif %}
+
+                <div class="settings-card">
+                    <h2>Alterar Senha</h2>
+                    <form method="post" action="/trocar_senha_logado">
+                        <input type="hidden" name="csrf_token" value="{{ request.session.get('CSRF_token') }}">
+                        <input type="hidden" name="action" value="mudar_senha">
+                        <div class="form-group">
+                            <label for="senha_atual">Senha Atual</label>
+                            <input type="password" id="senha_atual" name="senha_atual" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="nova_senha">Nova Senha (mínimo 6 caracteres)</label>
+                            <input type="password" id="nova_senha" name="nova_senha" required minlength="6">
+                        </div>
+                        <div class="form-group">
+                            <label for="confirmar_nova_senha">Confirmar Nova Senha</label>
+                            <input type="password" id="confirmar_nova_senha" name="confirmar_nova_senha" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Salvar Nova Senha</button>
+                    </form>
+                </div>
+            </div>
+        </main>
+    </div>
+
+
+    <script src="/static/js/sidebar.js"></script>
+    <script>
+        // --- SCRIPT PARA CONTROLAR O POPUP DE EXCLUSÃO ---
+        const popupDelete = document.getElementById('popupDelete');
+        const abrirPopupDeleteBtn = document.getElementById('abrirPopupDeleteBtn');
+        const fecharPopupDeleteBtn = document.getElementById('fecharPopupDeleteBtn');
+        const cancelarPopupDeleteBtn = document.getElementById('cancelarPopupDeleteBtn');
+
+        abrirPopupDeleteBtn.addEventListener('click', () => {
+            popupDelete.classList.add('popupdelete-visivel');
+        });
+
+        const fecharPopup = () => {
+            popupDelete.classList.remove('popupdelete-visivel');
+        };
+
+        fecharPopupDeleteBtn.addEventListener('click', fecharPopup);
+        cancelarPopupDeleteBtn.addEventListener('click', fecharPopup);
+
+        // Opcional: fechar o popup se clicar fora do conteúdo
+        popupDelete.addEventListener('click', (event) => {
+            if (event.target === popupDelete) {
+                fecharPopup();
+            }
+        });
+    </script>
+</body>
+
+</html>

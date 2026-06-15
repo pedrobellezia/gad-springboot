@@ -1,6 +1,7 @@
 package com.example.gad.repositories;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -13,4 +14,6 @@ public interface RedatorRepository extends JpaRepository<Redator, UUID> {
     List<RedatorProjection> findAllProjectedBy();
 
     boolean existsByEmpresaId(String empresaId);
+
+    Optional<Redator> findByUsuarioEmail(String email);
 }

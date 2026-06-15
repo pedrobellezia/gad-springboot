@@ -34,7 +34,7 @@ public class UsuarioController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN') or @usuarioService.findById(#id).getEmail() == authentication.name")
+    @PreAuthorize("hasRole('ADMIN') or @securityService.isOwnerOfUser(#id, authentication)")
     public ResponseEntity<Usuario> findById(@PathVariable UUID id) {
         return ResponseEntity.ok(usuarioService.findById(id));
     }
@@ -55,7 +55,7 @@ public class UsuarioController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN') or @usuarioService.findById(#id).getEmail() == authentication.name")
+    @PreAuthorize("hasRole('ADMIN') or @securityService.isOwnerOfUser(#id, authentication)")
     public ResponseEntity<Void> update(@Valid @RequestBody UsuarioUpdateDTO dto, @PathVariable UUID id) {
 
         dto.setId(id);

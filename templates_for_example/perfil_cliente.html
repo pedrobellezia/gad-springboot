@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Perfil</title>
+    <link rel="icon" type="image/png" sizes="16x16" href="/static/img/assets/fav_icon.png">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600&display=swap"
+          rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded" rel="stylesheet"/>
+    <link rel="stylesheet" href="/static/css/painel_gestor.css">
+    <link rel="stylesheet" href="/static/css/sidebar.css">
+    <link rel="stylesheet" href="/static/css/profile.css">
+    <link rel="stylesheet" href="/static/css/responsividade.css">
+    <link rel="stylesheet" href="/static/css/error_popup.css">
+</head>
+
+<body>
+<!-- Popup de Erro -->
+{% if error %}
+<div id="errorPopup" class="popup-overlay">
+    <div class="popup-container">
+        <div class="popup-icon">
+            <svg viewBox="0 0 24 24" fill="none">
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+            </svg>
+        </div>
+        <p class="popup-message">{{ error }}</p>
+        <button id="closePopup" class="popup-button">OK</button>
+    </div>
+</div>
+{% endif %}
+
+<!-- Popup de Confirmação -->
+<div id="confirmPopup" class="popup-overlay hidden">
+    <div class="popup-container">
+        <div class="popup-icon warning">
+            <svg viewBox="0 0 24 24" fill="none">
+                <line x1="12" y1="8" x2="12" y2="12"></line>
+                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                <circle cx="12" cy="12" r="10" stroke="white" stroke-width="2" fill="none"></circle>
+            </svg>
+        </div>
+        <p class="popup-message" id="confirmMessage">Tem certeza que deseja desvincular sua conta do Instagram?</p>
+        <div class="popup-buttons">
+            <button id="cancelButton" class="popup-button secondary">Cancelar</button>
+            <button id="confirmButton" class="popup-button danger">Desvincular</button>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <aside class="sidebar expanded" id="sidebar">
+        <div class="logo">
+            <img src="/static/img/assets/logo_GAD_PAINEL.png" alt="Logo" style="width: 80%; height: auto;"/>
+        </div>
+        <nav class="menu-wrapper">
+            <div class="menu">
+                <a href="/dashboard" class="menu-item"><span
+                        class="material-symbols-rounded">space_dashboard</span><span
+                        class="text">Postagens</span></a>
+                <a href="/convites" class="menu-item"><span
+                        class="material-symbols-rounded">forward_to_inbox</span><span
+                        class="text">Convites</span></a>
+                <a href="/perfil" class="menu-item active"><span class="material-symbols-rounded">Person</span><span
+                        class="text">Perfil</span></a>
+                <a href="/config" class="menu-item"><span
+                        class="material-symbols-rounded">settings</span><span class="text">Configurações</span></a>
+
+            </div>
+            <div style="margin-top: auto; width: 100%;">
+                <a href="/logout" class="menu-item logout">
+                    <span class="material-symbols-rounded">exit_to_app</span>
+                    <span class="text">Sair</span>
+                </a>
+            </div>
+        </nav>
+    </aside>
+
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    <main class="main-content">
+        <header class="header">
+            <button id="toggleBtn" class="toggle-btn">
+                <span class="material-symbols-rounded" id="iconToggle">chevron_left</span>
+            </button>
+            <h1>Perfil</h1>
+            <div class="user-info">
+                <span>{{cliente.nome}}</span>
+                <img src="/static/img/avatar/{{ cliente.avatar }}" alt="Avatar do Usuario ?>" class="avatar">
+            </div>
+        </header>
+
+        <div class="profile-container">
+            <div class="profile-card">
+                <div class="profile-header">
+                    <a href="javascript:void(0);" onclick="abrirModal()" title="Trocar Foto do Perfil"
+                       class="avatar-link">
+                        <img src="/static/img/avatar/{{ cliente.avatar }}" alt="Avatar do Usuario"
+                             class="profile-avatar">
+                    </a>
+                    <div class="profile-info">
+                        <h2>{{ cliente.nome }}</h2>
+                        <p>{{ cliente.email}}</p>
+                        <span class="badge">Redator</span>
+                    </div>
+                </div>
+
+                <div class="profile-details">
+                    <h3>Meu Vínculo</h3>
+                    {% if cliente.redator_nome %}
+                    <div class="details-grid">
+                        <div class="detail-item">
+                            <p><strong>Redator:</strong> {{ cliente.redator_nome}}</p>
+                        </div>
+                        <div class="detail-item">
+                            <p><strong>Código
+                                Utilizado:</strong> {{ cliente.token }} </p>
+                            <p><strong>Data da
+                                Vinculação:</strong> Eu só tenho quando foi criado n tenho quando o vinculo foi feito
+                            </p>
+                        </div>
+                    </div>
+                    {% else %}
+                    <p>Você ainda não está vinculado a um gestor. Vá para a página de "Convites" para se vincular.</p>
+                    {% endif %}
+                </div>
+
+                <div class="profile-details">
+                    <h3>Conta do Instagram</h3>
+                    {% if instagram %}
+                    <div class="instagram-connected">
+                        <div class="instagram-info">
+                            <img src="{{ instagram.foto_url }}" alt="Foto do Instagram" class="instagram-avatar">
+                            <div class="instagram-text">
+                                <h4>{{ instagram.nome }}</h4>
+                                <p>@{{ instagram.arroba }}</p>
+                            </div>
+                        </div>
+                        <button class="btn-desvincular-instagram" onclick="desvincularInstagram()">
+                            <span class="material-symbols-rounded">link_off</span>
+                            Desvincular
+                        </button>
+                    </div>
+                    {% else %}
+                    <div class="instagram-not-connected">
+                        <p class="instagram-description">
+                            Conecte sua conta do Instagram para publicar conteúdo diretamente através do GAD.
+                        </p>
+                        <a href="https://www.instagram.com/accounts/login/?force_authentication&platform_app_id=794315106791791&next=%2Foauth%2Fauthorize%2Fthird_party%2F%3Fredirect_uri%3Dhttps%253A%252F%252Funaccountable-ted-interphalangeal.ngrok-free.dev%252Finstagram%252Fauth%252Fcallback%26response_type%3Dcode%26scope%3Dinstagram_business_basic%252Cinstagram_business_manage_messages%252Cinstagram_business_manage_comments%252Cinstagram_business_content_publish%252Cinstagram_business_manage_insights%26client_id%3D794315106791791%26logger_id%3Dec384e5e-f650-449a-aec6-7c9288411f30&enable_fb_login&flo=true"
+                           class="btn-conectar-instagram">
+                            <span class="material-symbols-rounded">photo_camera</span>
+                            Conectar Instagram
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+
+<div id="avatarUploadModal" class="upload-modal-overlay">
+    <div class="upload-modal-content">
+        <button class="upload-modal-fechar" onclick="fecharModal()">
+            <span class="material-symbols-rounded">close</span>
+        </button>
+
+        <div class="upload-modal-header">
+            <div class="icon-wrapper">
+                <span class="material-symbols-rounded">upload_file</span>
+            </div>
+            <h2>Alterar Foto do Perfil</h2>
+            <p>Escolha uma imagem (JPG, PNG) de até 2MB.</p>
+        </div>
+
+        <form action="/upload_avatar" method="POST" enctype="multipart/form-data">
+            <input type="file" name="avatar_file" required accept="image/jpeg, image/png">
+            <input type="hidden" name="csrf_token" value="{{ request.session.get('CSRF_token') }}">
+            <div class="upload-modal-botoes">
+                <button type="button" class="upload-modal-btn-secundario" onclick="fecharModal()">Cancelar</button>
+                <button type="submit" class="upload-modal-btn-primario">Salvar Foto</button>
+            </div>
+        </form>
+    </div>
+</div>
+<script src="/static/js/sidebar.js"></script>
+<script src="/static/js/error_popup.js"></script>
+<script>
+
+
+    const modal = document.getElementById('avatarUploadModal');
+
+    function abrirModal() {
+        modal.classList.add('visible');
+    }
+
+    function fecharModal() {
+        modal.classList.remove('visible');
+    }
+
+    // Opcional: fechar o modal clicando fora dele
+    modal.addEventListener('click', function (event) {
+        if (event.target === modal) {
+            fecharModal();
+        }
+    });
+
+    // Função para desvincular Instagram
+    function desvincularInstagram() {
+        const confirmPopup = document.getElementById('confirmPopup');
+        const confirmButton = document.getElementById('confirmButton');
+        const cancelButton = document.getElementById('cancelButton');
+
+        // Mostrar o popup
+        confirmPopup.classList.remove('hidden');
+
+        // Handler para confirmar
+        const handleConfirm = async () => {
+            confirmPopup.classList.add('hidden');
+            confirmButton.removeEventListener('click', handleConfirm);
+            cancelButton.removeEventListener('click', handleCancel);
+
+            try {
+                const response = await fetch('/instagram/users/me', {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-Token': '{{ request.session.get("CSRF_token") }}'
+                    }
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    // Redirecionar para a mesma página para recarregar os dados
+                    window.location.reload();
+                } else {
+                    showErrorPopup('Erro ao desvincular Instagram: ' + (data.detail || 'Erro desconhecido'));
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+                showErrorPopup('Erro ao desvincular Instagram. Tente novamente.');
+            }
+        };
+
+        // Handler para cancelar
+        const handleCancel = () => {
+            confirmPopup.classList.add('hidden');
+            confirmButton.removeEventListener('click', handleConfirm);
+            cancelButton.removeEventListener('click', handleCancel);
+        };
+
+        // Adicionar event listeners
+        confirmButton.addEventListener('click', handleConfirm);
+        cancelButton.addEventListener('click', handleCancel);
+
+        // Fechar ao clicar fora do popup
+        confirmPopup.addEventListener('click', function(e) {
+            if (e.target === confirmPopup) {
+                handleCancel();
+            }
+        });
+
+        // Fechar com ESC
+        const escHandler = (e) => {
+            if (e.key === 'Escape') {
+                handleCancel();
+                document.removeEventListener('keydown', escHandler);
+            }
+        };
+        document.addEventListener('keydown', escHandler);
+    }
+
+    // Função auxiliar para mostrar popup de erro dinâmico
+    function showErrorPopup(message) {
+        let errorPopup = document.getElementById('dynamicErrorPopup');
+
+        if (!errorPopup) {
+            // Criar popup de erro se não existir
+            errorPopup = document.createElement('div');
+            errorPopup.id = 'dynamicErrorPopup';
+            errorPopup.className = 'popup-overlay';
+            errorPopup.innerHTML = `
+                <div class="popup-container">
+                    <div class="popup-icon">
+                        <svg viewBox="0 0 24 24" fill="none">
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                        </svg>
+                    </div>
+                    <p class="popup-message" id="dynamicErrorMessage"></p>
+                    <button id="closeErrorButton" class="popup-button">OK</button>
+                </div>
+            `;
+            document.body.appendChild(errorPopup);
+        }
+
+        const messageElement = errorPopup.querySelector('#dynamicErrorMessage');
+        const closeButton = errorPopup.querySelector('#closeErrorButton');
+
+        messageElement.textContent = message;
+        errorPopup.classList.remove('hidden');
+
+        closeButton.onclick = () => {
+            errorPopup.classList.add('hidden');
+        };
+
+        errorPopup.onclick = (e) => {
+            if (e.target === errorPopup) {
+                errorPopup.classList.add('hidden');
+            }
+        };
+    }
+</script>
+</body>
+
+</html>

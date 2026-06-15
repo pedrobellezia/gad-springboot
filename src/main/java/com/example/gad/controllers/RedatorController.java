@@ -41,13 +41,13 @@ public class RedatorController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN') or @redatorService.findById(#id).getUsuario().getEmail() == authentication.name")
+    @PreAuthorize("hasRole('ADMIN') or @securityService.isOwnerOfRedator(#id, authentication)")
     public ResponseEntity<Redator> findById(@PathVariable UUID id) {
         return ResponseEntity.ok(redatorService.findById(id));
     }
 
     @GetMapping("/{id}/posts")
-    @PreAuthorize("hasRole('ADMIN') or @redatorService.findById(#id).getUsuario().getEmail() == authentication.name")
+    @PreAuthorize("hasRole('ADMIN') or @securityService.isOwnerOfRedator(#id, authentication)")
     public ResponseEntity<List<PostProjection>> findAllPostsByRedatorId(@PathVariable UUID id) {
         return ResponseEntity.ok(postService.findAllByRedator_Id(id));
     }
@@ -69,7 +69,7 @@ public class RedatorController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN') or @redatorService.findById(#id).getUsuario().getEmail() == authentication.name")
+    @PreAuthorize("hasRole('ADMIN') or @securityService.isOwnerOfRedator(#id, authentication)")
     public ResponseEntity<Void> update(@Valid @RequestBody RedatorUpdateDTO objDto, @PathVariable UUID id) {
 
         redatorService.update(id, objDto);

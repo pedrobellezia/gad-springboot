@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Recuperar Senha</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/css/login_cadastro.css">
+    <link rel="icon" type="image/png" sizes="16x16" href="/static/img/assets/fav_icon.png">
+    <style>
+        #message {
+            margin: 12px 0 18px;
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-height: 40px;
+            box-sizing: border-box;
+            opacity: 0;
+            transform: translateY(-6px);
+            transition: opacity .18s ease, transform .18s ease, box-shadow .18s ease;
+            pointer-events: none;
+            visibility: hidden;
+            border-left: 4px solid transparent;
+            background: rgba(0, 0, 0, 0.03);
+            color: #222 !important;
+        }
+
+        /* mostrar */
+        #message.show {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+            visibility: visible;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+        }
+
+        /* tipos */
+        #message.error {
+            background: #fff5f5;
+            border-left-color: #e55353;
+            color: #8a1f1f !important;
+        }
+
+        #message.success {
+            background: #f6ffed;
+            border-left-color: #34a853;
+            color: #1e5326 !important;
+        }
+
+        #message.info {
+            background: #eef7ff;
+            border-left-color: #2b7cff;
+            color: #08306b !important;
+        }
+
+        #message::before {
+            content: "";
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            flex: 0 0 18px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 18px;
+            font-size: 14px;
+        }
+
+        #message > span {
+            line-height: 1;
+        }
+
+        @media (max-width: 480px) {
+            #message {
+                font-size: 13px;
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="left"></div>
+    <div class="right">
+        <form id="resetForm">
+            <h2>Recuperar Senha</h2>
+            <p class="sub">Cria Nova senha</p>
+
+            <label for="nova_senha">Nova Senha</label>
+            <input type="password" id="nova_senha" name="nova_senha" placeholder="Digite sua nova senha" required minlength="6">
+
+            <label for="repetir_senha">Repetir Nova Senha</label>
+            <input type="password" id="repetir_senha" name="repetir_senha" placeholder="Repita sua nova senha" required minlength="6">
+
+            <div id="message"></div>
+
+            <button type="submit" id="submit-btn" disabled style="opacity: 0.5; cursor: not-allowed;">Trocar Senha</button>
+        </form>
+    </div>
+</div>
+<script>
+    const novaSenha = document.getElementById('nova_senha');
+    const repetirSenha = document.getElementById('repetir_senha');
+    const msg = document.getElementById('message');
+    const btn = document.getElementById('submit-btn');
+
+    function checkPasswords() {
+        if (!novaSenha.value || !repetirSenha.value) {
+            btn.disabled = true;
+            btn.style.opacity = 0.5;
+            btn.style.cursor = 'not-allowed';
+            msg.className = '';
+            msg.textContent = '';
+            return;
+        }
+
+        if (novaSenha.value !== repetirSenha.value) {
+            btn.disabled = true;
+            btn.style.opacity = 0.5;
+            btn.style.cursor = 'not-allowed';
+            msg.className = 'show error';
+            msg.innerHTML = '<span>As senhas não coincidem.</span>';
+        } else if (novaSenha.value.length < 6) {
+            btn.disabled = true;
+            btn.style.opacity = 0.5;
+            btn.style.cursor = 'not-allowed';
+            msg.className = 'show error';
+            msg.innerHTML = '<span>A nova senha deve ter no mínimo 6 caracteres.</span>';
+        } else {
+            btn.disabled = false;
+            btn.style.opacity = 1;
+            btn.style.cursor = 'pointer';
+            msg.className = 'show success';
+            msg.innerHTML = '<span>As senhas coincidem! Pronto para salvar.</span>';
+        }
+    }
+
+    novaSenha.addEventListener('input', checkPasswords);
+    repetirSenha.addEventListener('input', checkPasswords);
+
+    document.getElementById('resetForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        msg.className = 'show success';
+        msg.innerHTML = '<span>Senha alterada com sucesso! Redirecionando...</span>';
+        setTimeout(() => {
+            window.location.href = '/login';
+        }, 2000);
+    });
+</script>
+</body>
+</html>

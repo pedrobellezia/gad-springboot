@@ -1,0 +1,246 @@
+:root {
+    --cor-principal: #843af3;
+    --cor-verde: #4ce68b;
+    --cor-amarelo: #FFB300;
+    --cor-vermelho: #ff3b3b;
+    --cor-cinza: #6c757d;
+    --cor-fundo: #f5f6fa;
+    --cor-texto: #333;
+    --cor-texto-claro: #555;
+    --cor-borda: #f0f0f0;
+    --cor-branca: #fff;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    letter-spacing: 0.001rem;
+}
+
+body {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    background: var(--cor-fundo);
+    color: var(--cor-texto);
+}
+
+.container {
+    display: flex;
+    min-height: 100vh;
+}
+
+.main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 2rem;
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    background: var(--cor-branca);
+    padding: 1rem;
+    border-radius: 1rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    margin-bottom: 2rem;
+}
+
+.header h1 {
+    flex: 1;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.postagens-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+}
+
+.postagem-card {
+    background: var(--cor-branca);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    border-radius: 16px;
+    padding: 1.5rem;
+    width: 340px;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.postagem-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
+}
+
+.card-conteudo {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    margin-top: 1.5rem;
+    gap: 1rem;
+}
+
+.postagem-card h3 {
+    margin: 0 0 0.25rem 0;
+    color: var(--cor-texto);
+}
+
+.postagem-card p {
+    color: var(--cor-texto-claro);
+    font-size: 0.95rem;
+}
+
+.texto-truncado {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+}
+
+.postagem-card img.miniatura, .postagem-card video.miniatura {
+    width: 100%;
+    max-width: 200px;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 8px !important;
+    margin: auto;
+    display: block;
+    background-color: #f0f0f0;
+}
+
+.card-footer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid #eee;
+    width: 100%;
+}
+
+.data {
+    font-size: 0.9rem;
+    color: #999;
+}
+
+.form-feedback {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+.feedback-textarea {
+    width: 100%;
+    min-height: 80px;
+    padding: 12px 16px;
+    border-radius: 12px;
+    border: 1.5px solid #e0e0e0;
+    font-family: inherit;
+    font-size: 0.95rem;
+    color: var(--cor-texto-claro);
+    background-color: #fdfdff;
+    resize: vertical;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+}
+
+.feedback-textarea::placeholder {
+    color: #b0b0b0;
+}
+
+.feedback-textarea:focus {
+    outline: none;
+    border-color: var(--cor-principal);
+    box-shadow: 0 0 0 3px rgba(132, 58, 243, 0.15);
+}
+
+.acoes-botoes {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    width: 100%;
+}
+
+.acoes-botoes button {
+    flex-grow: 1;
+    padding: 0.75rem;
+    border: none;
+    border-radius: 8px;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.acoes-botoes button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.btn-aprovar {
+    background-color: var(--cor-verde);
+}
+
+.btn-revisar {
+    background-color: var(--cor-principal);
+}
+
+.btn-reprovar {
+    background-color: var(--cor-vermelho);
+}
+
+.status-badge {
+    display: inline-block;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: white;
+    text-align: center;
+}
+
+.status-rascunho {
+    background: #f1f3f5;
+    color: #495057;
+}
+
+.status-revisao {
+    background: #e0f2fe;
+    color: #0284c7;
+}
+
+.status-aprovado {
+    background: #dcfce7;
+    color: #16a34a;
+}
+
+.status-rejeitado {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+.status-alteracao_pendente {
+    background: #fef3c7;
+    color: #d97706;
+}
+
+.status-publicado {
+    background: #f3ebff;
+    color: #843af3;
+}

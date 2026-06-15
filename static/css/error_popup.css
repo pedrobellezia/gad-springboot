@@ -1,0 +1,185 @@
+/* Overlay para deixar o fundo escuro e desfocado */
+.popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(5px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+.popup-overlay.hidden {
+    display: none;
+}
+
+/* Container do popup */
+.popup-container {
+    background-color: white;
+    border-radius: 16px;
+    padding: 32px;
+    max-width: 450px;
+    width: 90%;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    text-align: center;
+    animation: slideUp 0.3s ease-out;
+    position: relative;
+}
+
+/* Ícone de erro (X dentro de círculo vermelho) */
+.popup-icon {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background-color: #dc3545;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto 24px;
+    animation: scaleIn 0.4s ease-out;
+}
+
+.popup-icon svg {
+    width: 40px;
+    height: 40px;
+    stroke: white;
+    stroke-width: 3;
+    stroke-linecap: round;
+}
+
+/* Mensagem de erro */
+.popup-message {
+    font-size: 18px;
+    color: #333;
+    margin-bottom: 28px;
+    line-height: 1.5;
+    font-weight: 500;
+}
+
+/* Botão OK */
+.popup-button {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 12px 48px;
+    font-size: 16px;
+    font-weight: 600;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.popup-button:hover {
+    background-color: #c82333;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(220, 53, 69, 0.4);
+}
+
+.popup-button:active {
+    transform: translateY(0);
+}
+
+/* Animações */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(30px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes scaleIn {
+    0% {
+        transform: scale(0);
+        opacity: 0;
+    }
+    50% {
+        transform: scale(1.1);
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* Popup de confirmação (variante do popup de erro) */
+.popup-icon.warning {
+    background-color: #ff9800;
+}
+
+.popup-icon.warning svg {
+    stroke: white;
+    stroke-width: 3;
+    stroke-linecap: round;
+}
+
+.popup-buttons {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    margin-top: 28px;
+}
+
+.popup-button.secondary {
+    background-color: #6c757d;
+}
+
+.popup-button.secondary:hover {
+    background-color: #5a6268;
+    box-shadow: 0 4px 12px rgba(108, 117, 125, 0.4);
+}
+
+.popup-button.danger {
+    background-color: #dc3545;
+}
+
+.popup-button.danger:hover {
+    background-color: #c82333;
+    box-shadow: 0 4px 12px rgba(220, 53, 69, 0.4);
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .popup-container {
+        padding: 24px;
+        max-width: 90%;
+    }
+
+    .popup-icon {
+        width: 64px;
+        height: 64px;
+    }
+
+    .popup-icon svg {
+        width: 32px;
+        height: 32px;
+    }
+
+    .popup-message {
+        font-size: 16px;
+    }
+
+    .popup-button {
+        padding: 10px 36px;
+        font-size: 14px;
+    }
+}

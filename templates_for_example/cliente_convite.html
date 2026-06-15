@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8"/>
+    <title>Vincular Convite</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link rel="icon" type="image/png" href="/static/img/assets/fav_icon.png"/>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded" rel="stylesheet"/>
+    <link rel="stylesheet" href="/static/css/receber_convite.css">
+    <link rel="stylesheet" href="/static/css/sidebar.css">
+    <link rel="stylesheet" href="/static/css/responsividade.css">
+    <style>
+        /* Estilos Gerais dos Pop-ups */
+        .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .popup-content {
+            background: white;
+            border-radius: 1.25rem;
+            padding: 2.5rem;
+            max-width: 580px;
+            width: 90%;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            position: relative;
+            border: 2px solid #f0f0f0;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Cabeçalho do Pop-up */
+        .popup-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #f5f5f5;
+        }
+
+        .popup-header h2 {
+            color: #843af3;
+            margin: 0;
+            font-size: 1.4rem;
+            font-weight: 700;
+        }
+
+        .popup-header .material-symbols-rounded {
+            font-size: 2rem;
+            color: #843af3;
+        }
+
+        /* Botão de Fechar (X) */
+        .popup-close-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: #f5f5f5;
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: #666;
+            transition: all 0.3s ease;
+        }
+
+        .popup-close-btn:hover {
+            background: #843af3;
+            color: white;
+            transform: rotate(90deg);
+        }
+
+        .popup-close-btn .material-symbols-rounded {
+            font-size: 1.5rem;
+        }
+
+        .popup-content label {
+            color: #555;
+            font-weight: 600;
+            font-size: 0.95rem;
+            margin-bottom: -0.5rem;
+        }
+
+        .popup-content input[type="text"] {
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            padding: 0.85rem 1.25rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 0.75rem;
+            font-size: 1rem;
+            color: #333;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        .popup-content input[type="text"]:focus {
+            border-color: #843af3;
+            outline: none;
+            box-shadow: 0 0 0 4px rgba(132, 58, 243, 0.1);
+        }
+
+        .popup-content button {
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.75rem;
+            border: none;
+            cursor: pointer;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-roxo {
+            background: #843af3;
+            color: white;
+            box-shadow: 0 4px 12px rgba(132, 58, 243, 0.3);
+        }
+
+        .btn-roxo:hover {
+            background: #4ce68b;
+            box-shadow: 0 6px 16px rgba(76, 230, 139, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .btn-roxo:active {
+            transform: translateY(0);
+        }
+
+        .btn-cinza {
+            background: #f5f5f5;
+            color: #666;
+            border: 2px solid #e0e0e0;
+        }
+
+        .btn-cinza:hover {
+            background: #e8e8e8;
+            border-color: #d0d0d0;
+        }
+
+        /* Container para a mensagem de erro/sucesso */
+        .message-container {
+            min-height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            font-weight: 600;
+            text-align: center;
+            margin: 0.5rem 0;
+        }
+
+        .message-container p {
+            margin: 0;
+            padding: 0.75rem 1.25rem;
+            border-radius: 0.75rem;
+            font-size: 0.95rem;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message-container .success {
+            color: #2fa66d;
+            background-color: #e8f5f0;
+            border: 2px solid #c3e6cb;
+        }
+
+        .message-container .error {
+            color: #c1354e;
+            background-color: #ffe8ed;
+            border: 2px solid #f5c6cb;
+        }
+
+        /* Ícone de Sucesso */
+        .success-icon {
+            font-size: 4rem;
+            color: #4ce68b;
+            background: linear-gradient(135deg, #4ce68b, #2fa66d);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Estilo das instruções */
+        .popup-content ul {
+            background: #f8f9ff;
+            padding: 1rem 1rem 1rem 2rem;
+            border-radius: 0.75rem;
+            margin: 0;
+        }
+
+        .popup-content ul li {
+            margin-bottom: 0.5rem;
+            color: #555;
+            line-height: 1.6;
+        }
+
+        .popup-content ul li:last-child {
+            margin-bottom: 0;
+        }
+    </style>
+</head>
+
+<body>
+<div class="container">
+    <aside class="sidebar expanded" id="sidebar">
+        <div class="logo">
+            <img src="/static/img/assets/logo_GAD_PAINEL.png" alt="Logo" style="width: 80%; height: auto;"/>
+        </div>
+        <nav class="menu-wrapper">
+            <div class="menu">
+                <a href="/dashboard" class="menu-item"><span
+                        class="material-symbols-rounded">space_dashboard</span><span class="text">Postagens</span></a>
+                <a href="/convites" class="menu-item active"><span class="material-symbols-rounded">forward_to_inbox</span><span
+                        class="text">Convites</span></a>
+                <a href="/perfil" class="menu-item"><span class="material-symbols-rounded">person</span><span
+                        class="text">Perfil</span></a>
+                <a href="/config" class="menu-item"><span class="material-symbols-rounded">settings</span><span
+                        class="text">Configurações</span></a>
+
+            </div>
+            <div style="margin-top: auto;">
+                <a href="/logout" class="menu-item logout">
+                    <span class="material-symbols-rounded">exit_to_app</span>
+                    <span class="text">Sair</span>
+                </a>
+            </div>
+        </nav>
+    </aside>
+
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    <main class="main-content">
+        <header class="header">
+            <button id="toggleBtn" class="toggle-btn"><span class="material-symbols-rounded" id="iconToggle">chevron_left</span>
+            </button>
+            <h1>Vincular Convite</h1>
+            <div class="user-info"><span>{{ usuario.nome }}</span>
+                <img
+                        src="/static/img/avatar/{{ usuario.avatar }}"
+                        class="avatar"
+                        alt="Avatar do usuário">
+            </div>
+        </header>
+
+        <section class="modal-section">
+            {% if not token %}
+            <span class="material-symbols-rounded">forward_to_inbox</span>
+            <h2 style="color: #333; margin: 1rem 0 0.5rem 0; font-size: 1.8rem; font-weight: 700;">Vincular Convite</h2>
+            <p style="color: #666; text-align: center; margin-bottom: 1rem; max-width: 450px; line-height: 1.6;">
+                Para começar a receber postagens do seu gestor, vincule o código de convite fornecido por ele.
+            </p>
+
+            <div class="message-container" id="messageContainer">
+                <!-- Mensagens serão exibidas aqui dinamicamente -->
+            </div>
+
+            <button class="btn-roxo" onclick="abrirPopup()">Vincular Agora</button>
+            {% else %}
+            <div class="convite-info-card">
+                <div class="convite-info-item">
+                    <strong>Código do Convite</strong>
+                    <div class="convite-codigo-value">{{ token.codigo }}</div>
+                </div>
+
+                <div class="convite-info-item">
+                    <strong>Seu Gestor</strong>
+                    <div class="convite-info-value convite-gestor-value">{{ token.nome_redator }}</div>
+                </div>
+
+                <div class="convite-info-item">
+                    <strong>Vinculado em</strong>
+                    <div class="convite-info-value">
+                        <span class="material-symbols-rounded">calendar_today</span>
+                        {{ token.date }}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </section>
+    </main>
+</div>
+
+<!-- Modal Vinculação -->
+<div class="popup-overlay" id="popup" style="display: none;">
+    <form id="formVinculacao" class="popup-content">
+        <button type="button" class="popup-close-btn" onclick="fecharPopup()">
+            <span class="material-symbols-rounded">close</span>
+        </button>
+
+        <div class="popup-header">
+            <span class="material-symbols-rounded" style="font-size: 2rem; color: #843af3;">link</span>
+            <h2 style="color: #843af3; margin: 0;">Vincular código do gestor</h2>
+        </div>
+
+        <label for="codigo"><strong>Código do gestor:</strong></label>
+        <input type="text" id="codigo" name="codigo" placeholder="Ex: 58e7a72ffa" required>
+
+        <input type="hidden" name="csrf_token" value="{{ request.session.get('CSRF_token') }}">
+
+
+        <div style="font-size: 0.9rem;">
+            <strong>Instruções para vinculação:</strong>
+            <ul style="padding-left: 1rem; margin-top: 0.5rem;">
+                <li style="margin-bottom: 0.5rem;">O código é fornecido pelo seu gestor;</li>
+                <li style="margin-bottom: 0.5rem;">Você pode se vincular a apenas um único gestor;</li>
+                <li style="margin-bottom: 0.5rem;">Se futuramente desejar trocar de gestor, solicite a desvinculação ao
+                    gestor atual;
+                </li>
+                <li>Utilize o código exatamente como recebido, sem alterações.</li>
+            </ul>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 0.5rem; margin-top: 1rem;">
+            <button type="button" class="btn-cinza" onclick="fecharPopup()">Cancelar</button>
+            <button type="submit" class="btn-roxo">Vincular Agora</button>
+        </div>
+    </form>
+</div>
+
+<!-- Modal Sucesso -->
+<div class="popup-overlay" id="popupSucesso" style="display: none;">
+    <div class="popup-content" style="align-items: center; text-align: center; max-width: 450px;">
+        <button type="button" class="popup-close-btn" onclick="fecharPopupSucesso()">
+            <span class="material-symbols-rounded">close</span>
+        </button>
+        <span class="material-symbols-rounded success-icon">task_alt</span>
+        <h2 style="color: #333; margin: 0.5rem 0; font-size: 1.8rem; font-weight: 700;">Convite Vinculado!</h2>
+        <p style="margin: 0; color: #666; line-height: 1.6; font-size: 1.05rem;">
+            Seu convite foi vinculado com sucesso. Agora você pode receber postagens do seu gestor.
+        </p>
+
+        <button class="btn-roxo" onclick="fecharPopupSucesso()" style="margin-top: 0.5rem;">Entendi!</button>
+    </div>
+</div>
+
+<script>
+    // --- LÓGICA DA SIDEBAR ---
+    const sidebar = document.getElementById('sidebar');
+    const toggleBtn = document.getElementById('toggleBtn');
+    const iconToggle = document.getElementById('iconToggle');
+    const sidebarOverlay = document.getElementById('sidebarOverlay'); // Pega o novo overlay
+
+    // Função para ABRIR a sidebar
+    function abrirSidebar() {
+        if (sidebar) sidebar.classList.add('expanded');
+        if (sidebar) sidebar.classList.remove('collapsed');
+        if (sidebarOverlay) sidebarOverlay.classList.add('visible');
+        localStorage.setItem('sidebarCollapsed', 'false');
+        if (iconToggle) updateIcon();
+    }
+
+    // Função para FECHAR a sidebar
+    function fecharSidebar() {
+        if (sidebar) sidebar.classList.add('collapsed');
+        if (sidebar) sidebar.classList.remove('expanded');
+        if (sidebarOverlay) sidebarOverlay.classList.remove('visible');
+        localStorage.setItem('sidebarCollapsed', 'true');
+        if (iconToggle) updateIcon();
+    }
+
+    // Função para atualizar o ícone do botão
+    function updateIcon() {
+        // No celular, o ícone deve ser sempre o de menu quando fechado e de fechar quando aberto
+        if (window.innerWidth <= 768) {
+            iconToggle.textContent = sidebar.classList.contains('expanded') ? 'close' : 'menu';
+        } else { // Comportamento para desktop
+            iconToggle.textContent = sidebar.classList.contains('collapsed') ? 'menu' : 'chevron_left';
+        }
+    }
+
+    // Evento de clique no botão principal
+    toggleBtn.addEventListener('click', () => {
+        if (sidebar.classList.contains('collapsed')) {
+            abrirSidebar();
+        } else {
+            fecharSidebar();
+        }
+    });
+
+    // Evento de clique no OVERLAY para fechar o menu
+    sidebarOverlay.addEventListener('click', () => {
+        fecharSidebar();
+    });
+
+    // Estado inicial da sidebar ao carregar a página
+    // Apenas no desktop respeitamos o localStorage. No mobile, começa sempre fechada.
+    if (window.innerWidth > 768) {
+        if (localStorage.getItem('sidebarCollapsed') === 'true') {
+            fecharSidebar();
+        } else {
+            abrirSidebar();
+        }
+    } else {
+        fecharSidebar(); // Força o estado fechado inicial no mobile
+    }
+
+    // Atualiza o ícone caso o tamanho da janela mude
+    window.addEventListener('resize', updateIcon);
+
+
+    // --- LÓGICA DOS POPUPS (Exemplo da página receber_convite.php) ---
+    const popup = document.getElementById('popup');
+    const popupSucesso = document.getElementById('popupSucesso');
+
+    function abrirPopup() {
+        if (popup) popup.style.display = 'flex';
+    }
+
+    function fecharPopup() {
+        if (popup) popup.style.display = 'none';
+    }
+
+    function fecharPopupSucesso() {
+        if (popupSucesso) popupSucesso.style.display = 'none';
+    }
+
+    if (popup) {
+        popup.addEventListener('click', function (event) {
+            if (event.target === popup) {
+                fecharPopup();
+            }
+        });
+    }
+    if (popupSucesso) {
+        popupSucesso.addEventListener('click', function (event) {
+            if (event.target === popupSucesso) {
+                fecharPopupSucesso();
+            }
+        });
+    }
+
+    // --- LÓGICA DO FORMULÁRIO DE VINCULAÇÃO ---
+    const formVinculacao = document.getElementById('formVinculacao');
+    const messageContainer = document.getElementById('messageContainer');
+
+    // Função para exibir mensagem no container
+    function exibirMensagem(mensagem, tipo) {
+        if (messageContainer) {
+            messageContainer.innerHTML = `<p class="${tipo}">${mensagem}</p>`;
+            // Auto-limpar mensagem após 5 segundos
+            setTimeout(() => {
+                messageContainer.innerHTML = '';
+            }, 5000);
+        }
+    }
+
+    if (formVinculacao) {
+        formVinculacao.addEventListener('submit', async function (event) {
+            event.preventDefault();
+            const formData = new FormData(formVinculacao);
+
+            // Limpa mensagens anteriores
+            if (messageContainer) {
+                messageContainer.innerHTML = '';
+            }
+
+            try {
+                const response = await fetch('/vincular_cliente_token', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+                console.log(data);
+
+                if (data.success) {
+                    exibirMensagem(data.detail, 'success');
+                    fecharPopup();
+                    if (popupSucesso) popupSucesso.style.display = 'flex';
+                    setTimeout(() => {
+                        location.reload();
+                    }, 1000);
+                } else {
+                    fecharPopup();
+                    exibirMensagem(data.detail, 'error');
+                }
+            } catch (error) {
+                fecharPopup();
+                exibirMensagem('Erro de conexão com o servidor', 'error');
+            }
+        });
+    }
+
+
+</script>
+</body>
+</html>

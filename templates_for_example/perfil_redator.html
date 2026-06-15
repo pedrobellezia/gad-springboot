@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Perfil</title>
+    <link rel="icon" type="image/png" sizes="16x16" href="/static/img/assets/fav_icon.png">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600&display=swap"
+          rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded" rel="stylesheet"/>
+    <link rel="stylesheet" href="/static/css/painel_gestor.css">
+    <link rel="stylesheet" href="/static/css/sidebar.css">
+    <link rel="stylesheet" href="/static/css/profile.css">
+    <link rel="stylesheet" href="/static/css/responsividade.css">
+    <link rel="stylesheet" href="/static/css/error_popup.css">
+</head>
+
+<body>
+{% if error %}
+<div id="errorPopup" class="popup-overlay">
+    <div class="popup-container">
+        <div class="popup-icon">
+            <svg viewBox="0 0 24 24" fill="none">
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+            </svg>
+        </div>
+        <p class="popup-message">{{ error }}</p>
+        <button id="closePopup" class="popup-button">OK</button>
+    </div>
+</div>
+{% endif %}
+
+<div class="container">
+    <aside class="sidebar expanded" id="sidebar">
+        <div class="logo">
+            <img src="/static/img/assets/logo_GAD_PAINEL.png" alt="Logo" style="width: 80%; height: auto;"/>
+        </div>
+        <nav class="menu-wrapper">
+            <div class="menu">
+                <a href="/dashboard" class="menu-item"><span
+                        class="material-symbols-rounded">space_dashboard</span><span
+                        class="text">Postagens</span></a>
+                <a href="/convites" class="menu-item"><span
+                        class="material-symbols-rounded">forward_to_inbox</span><span
+                        class="text">Convites</span></a>
+                <a href="/perfil" class="menu-item active"><span class="material-symbols-rounded">Person</span><span
+                        class="text">Perfil</span></a>
+                <a href="/config" class="menu-item"><span
+                        class="material-symbols-rounded">settings</span><span class="text">Configurações</span></a>
+
+            </div>
+            <div style="margin-top: auto; width: 100%;">
+                <a href="/logout" class="menu-item logout">
+                    <span class="material-symbols-rounded">exit_to_app</span>
+                    <span class="text">Sair</span>
+                </a>
+            </div>
+        </nav>
+    </aside>
+
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    <main class="main-content">
+        <header class="header">
+            <button id="toggleBtn" class="toggle-btn">
+                <span class="material-symbols-rounded" id="iconToggle">chevron_left</span>
+            </button>
+            <h1>Perfil</h1>
+            
+            <div class="user-info">
+                <span>{{redator.nome}}</span>
+                {% if redator.avatar and redator.avatar|length > 4 and redator.avatar != "None" and redator.avatar != "icon_padrao.png" %}
+                    <img src="/static/img/avatar/{{ redator.avatar }}" alt="Avatar" class="avatar">
+                {% else %}
+                    <img src="https://ui-avatars.com/api/?name={{ redator.nome }}&background=843af3&color=fff&size=128" alt="Avatar" class="avatar">
+                {% endif %}
+            </div>
+        </header>
+
+        <div class="profile-container">
+            <div class="profile-card">
+                <div class="profile-header">
+                    <a href="javascript:void(0);" onclick="abrirModal()" title="Trocar Foto do Perfil"
+                       class="avatar-link">
+                        
+                        {% if redator.avatar and redator.avatar|length > 4 and redator.avatar != "None" and redator.avatar != "icon_padrao.png" %}
+                            <img src="/static/img/avatar/{{ redator.avatar }}" alt="Avatar do Usuario"
+                                 class="profile-avatar">
+                        {% else %}
+                            <img src="https://ui-avatars.com/api/?name={{ redator.nome }}&background=843af3&color=fff&size=128" alt="Avatar do Usuario"
+                                 class="profile-avatar">
+                        {% endif %}
+                        
+                    </a>
+                    <div class="profile-info">
+                        <h2>{{ redator.nome }}</h2>
+                        <p>{{ redator.email}}</p>
+                        <span class="badge">Redator</span>
+                    </div>
+                </div>
+
+                <div class="profile-details">
+                    <h3>Minha Carteira de Clientes</h3>
+
+{% if redator.clientes %}
+    <p style="margin-bottom: 1rem; color: #666;">
+        Você atende <strong>{{redator.clientes|length}}</strong> cliente(s):
+    </p>
+    
+    <div class="clientes-tags-wrapper">
+        {% for cliente in redator.clientes %}
+        <div class="cliente-tag">
+            <span class="material-symbols-rounded" style="font-size: 18px;">business</span>
+            <span>{{ cliente.nome }}</span>
+        </div>
+        {% endfor %}
+    </div>
+
+{% else %}
+    <div class="empty-state-small">
+        <p>Você ainda não possui clientes vinculados.</p>
+    </div>
+{% endif %}
+                    <br>
+                    <h3>Informações Comerciais</h3>
+                    <p>
+                        <strong>CNPJ:</strong>
+                        {{ redator.cnpj or 'Não informado' }}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+
+<div id="avatarUploadModal" class="upload-modal-overlay">
+    <div class="upload-modal-content">
+        <button class="upload-modal-fechar" onclick="fecharModal()">
+            <span class="material-symbols-rounded">close</span>
+        </button>
+
+        <div class="upload-modal-header">
+            <div class="icon-wrapper">
+                <span class="material-symbols-rounded">upload_file</span>
+            </div>
+            <h2>Alterar Foto do Perfil</h2>
+            <p>Escolha uma imagem (JPG, PNG) de até 2MB.</p>
+        </div>
+
+        <form action="/upload_avatar" method="POST" enctype="multipart/form-data">
+            <input type="file" name="avatar_file" required accept="image/jpeg, image/png">
+            <input type="hidden" name="csrf_token" value="{{ request.session.get('CSRF_token') }}">
+
+            <div class="upload-modal-botoes">
+                <button type="button" class="upload-modal-btn-secundario" onclick="fecharModal()">Cancelar</button>
+                <button type="submit" class="upload-modal-btn-primario">Salvar Foto</button>
+            </div>
+        </form>
+    </div>
+</div>
+<script src="/static/js/sidebar.js"></script>
+<script src="/static/js/error_popup.js"></script>
+<script>
+
+
+    const modal = document.getElementById('avatarUploadModal');
+
+    function abrirModal() {
+        modal.classList.add('visible');
+    }
+
+    function fecharModal() {
+        modal.classList.remove('visible');
+    }
+
+    // Opcional: fechar o modal clicando fora dele
+    modal.addEventListener('click', function (event) {
+        if (event.target === modal) {
+            fecharModal();
+        }
+    });
+</script>
+</body>
+
+</html>

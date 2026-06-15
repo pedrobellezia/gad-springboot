@@ -1,0 +1,591 @@
+type: collection.insomnia.rest/5.0
+schema_version: "5.1"
+name: Scrapper
+meta:
+  id: wrk_a2af0cfdd410456d952af7420281e5f6
+  created: 1750182757422
+  modified: 1770055125524
+  description: ""
+collection:
+  - name: Cnd
+    meta:
+      id: fld_2063b13f4654435b958a6024f9b0af3e
+      created: 1748275322495
+      modified: 1770055109344
+      sortKey: -1748275322495
+      description: ""
+    children:
+      - url: "{{ _.ip }}/execute_scrap"
+        name: Trabalhista
+        meta:
+          id: req_ffb11e2b9d594e6595729a3212a3acb6
+          created: 1747756460184
+          modified: 1770053469515
+          isPrivate: false
+          description: ""
+          sortKey: -1748275329285
+        method: POST
+        body:
+          mimeType: application/json
+          text: >-
+            {
+                "options": {
+                    "headless": true,
+                    "slow_mo": 250,
+                    "args": [
+                        "--disable-dev-shm-usage",
+                        "--disable-blink-features=AutomationControlled"
+                    ]
+                },
+
+                "steps": [
+                    {
+                        "func": "go_to",
+                        "args": {
+                            "url": "https://cndt-certidao.tst.jus.br/inicio.faces"
+                        }
+                    },           
+                    {
+                        "func": "click",
+                        "args": {
+                            "xpath": "//*[@id='corpo']/div/div[2]/input[1]"
+                        }
+                    },
+                    {
+                        "func": "insert",
+                        "args": {
+                            "xpath": "//*[@id='gerarCertidaoForm:cpfCnpj']",
+                            "text": "inserir cnpj aqui"
+                        }
+                    },
+                    {
+                        "func": "wait",
+                        "args":{
+                            "seconds": 5
+                        }
+                        
+                    },
+                    {
+                        "func": "captcha_solver",
+                        "args": {
+                            "api_key": "a7828fac8aea394fa604918d7dc0660d",
+                            "img_xpath": "//*[@id='idImgBase64']",
+                            "input_xpath": "//*[@id='idCampoResposta']"
+                        }
+                    },
+                    {
+                        "func": "save_file",
+                        "args": {
+                            "xpath": "//*[@id='gerarCertidaoForm:btnEmitirCertidao']",
+                            "path": "/pdf"
+                        }
+                    }        
+                ]
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/11.1.0
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.ip }}/execute_scrap"
+        name: "FGTS "
+        meta:
+          id: req_cc3d7058082643b0857e1d94f130d33a
+          created: 1747757571228
+          modified: 1770053165029
+          isPrivate: false
+          description: ""
+          sortKey: -1748275329385
+        method: POST
+        body:
+          mimeType: application/json
+          text: >-
+            {
+                "options": {
+                    "headless": false,
+                    "slow_mo": 550,
+                    "args": [
+                        "--disable-dev-shm-usage",
+                        "--disable-blink-features=AutomationControlled",
+                    		"--no-sandbox",
+                    		"--disable-infobars"
+                    ]
+                },
+
+                "steps": [
+                    {
+                        "func": "go_to",
+                        "args": {
+                            "url": "https://consulta-crf.caixa.gov.br/consultacrf/pages/consultaEmpregador.jsf"
+                        }
+                    },
+                    {
+                        "func": "insert",
+                        "args": {
+                          	"xpath": "//*[@id='mainForm:txtInscricao1']",
+                            "text": "34633231000154"								
+                        }
+                    },
+            				{
+            					"func": "click",
+            					"args":{
+            						"xpath": "//*[@id='mainForm:btnConsultar']"
+            					}
+            				},
+            				{
+            					"func": "click",
+            					"args":{
+            						"xpath": "//*[@id='mainForm:j_id51']"
+            					}
+            				},
+            				{
+            					"func": "click",
+            					"args":{
+            						"xpath": "//*[@id='mainForm:btnVisualizar']"
+            					}
+            				},			
+            				{
+                        "func": "page_to_pdf",
+                        "args": {                
+                            "path": "/cnd"
+                        }
+                    }				
+                ]
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/11.1.0
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.ip }}/execute_scrap"
+        name: "Betha - Municipal/Braço do norte "
+        meta:
+          id: req_24b981f56270421da966f96b0eac0b42
+          created: 1747763003860
+          modified: 1770053162120
+          isPrivate: false
+          description: ""
+          sortKey: -1748275329485
+        method: POST
+        body:
+          mimeType: application/json
+          text: >-
+            {
+                "options": {
+                    "headless": false,
+                    "slow_mo": 250,
+                    "args": [
+                        "--disable-dev-shm-usage",
+                        "--disable-blink-features=AutomationControlled",
+                        "--no-sandbox",
+                        "--disable-infobars"
+                    ]
+                },
+                "steps": [
+                    {
+                        "func": "go_to",
+                        "args": {
+                            "url": "https://e-gov.betha.com.br/cdweb/resource.faces?params=loyaHcSGS628HpGuUVuZcg=="
+                        }
+                    },
+                    {
+                        "func": "click",
+                        "args": {
+                            "xpath": "//*[@id='modoAcesso']/div[1]/div[2]/div/div/div/a"
+                        }
+                    },
+                    {
+                        "func": "insert",
+                        "args": {
+                            "xpath": "//*[@id='mainForm:cnpj']",
+                            "text": "19625833000176"
+                        }
+                    },
+                    {
+                        "func": "click",
+                        "args": {
+                            "xpath": "//*[@id='mainForm:btCnpj']"
+                        }
+                    },
+                    {
+                        "func": "switch_page",
+                        "args": {
+                            "xpath": "//*[@id='mainForm:t-contribuinte']/tbody/tr/td[3]/img"
+                        }
+                    },
+                    {
+            					"func": "wait_url_change",
+            					"args": {}
+            				},
+                    {
+                        "func": "page_to_pdf",
+                        "args": {                
+                            "path": "/cnd"
+                        }
+                    }
+                ]
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/11.1.0
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.ip }}/execute_scrap"
+        name: Estadual - SP
+        meta:
+          id: req_a9c3eaa3b14b4b6c9b62f562208d3483
+          created: 1748029138482
+          modified: 1770053766091
+          isPrivate: false
+          description: ""
+          sortKey: -1748275329185
+        method: POST
+        body:
+          mimeType: application/json
+          text: >-
+            {
+                "options": {
+                    "headless": true,
+                    "slow_mo": 250,
+                    "args": [
+                        "--disable-dev-shm-usage",
+                        "--disable-blink-features=AutomationControlled"
+                    ]
+                },
+
+                "steps": [
+                    {
+                        "func": "go_to",
+                        "args": {
+                            "url": "https://www10.fazenda.sp.gov.br/CertidaoNegativaDeb/Pages/EmissaoCertidaoNegativa.aspx"
+                        }
+                    },           
+                    {
+                        "func": "click",
+                        "args": {
+                            "xpath": "//*[@id='MainContent_cnpjradio']"
+                        }
+                    },
+                    {
+                        "func": "insert",
+                        "args": {
+                            "xpath": "//*[@id='MainContent_txtDocumento']",
+                            "text": "19625833000176"
+                        }
+                    },        
+                    {
+                        "func": "captcha_solver",
+                        "args": {
+                            "api_key": "a7828fac8aea394fa604918d7dc0660d"
+                        }
+                    },
+            				{
+                        "func": "click",
+                        "args": {
+                            "xpath": "//*[@id='MainContent_btnPesquisar']"
+                        }
+                    },        
+            				{
+            					"func": "wait",
+            					"args": {
+            						"seconds": 5
+            					}
+            				},
+                    {
+                        "func": "save_file",
+                        "args": {
+                            "xpath": "//*[@id='MainContent_btnImpressao']",
+                            "path": "/cnd"
+                        }
+                    }        
+                ]
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/11.1.0
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.ip }}/execute_scrap"
+        name: Betha - Municipal/Florianópolis
+        meta:
+          id: req_ca02c27d924748d7a41d8126b78b5d63
+          created: 1748282327204
+          modified: 1770053163676
+          isPrivate: false
+          description: ""
+          sortKey: -1748275329435
+        method: POST
+        body:
+          mimeType: application/json
+          text: >-
+            {
+                "browser_session": {
+                    "cookies": [
+                        {
+                            "name": "JSESSIONID",
+                            "value": "611E1B73B48D6CEE99871462CC43F55B.p1node1",
+                            "domain": "e-gov.betha.com.br",
+                            "path": "/cdweb/03114-522",
+                            "httpOnly": true,
+                            "secure": true,
+                            "sameSite": "Lax"
+                        }
+                    ],
+                    "origins": []
+                },
+                "options": {
+                    "headless": false,
+                    "slow_mo": 1000,
+                    "args": [
+                        "--disable-dev-shm-usage",
+                        "--disable-blink-features=AutomationControlled",
+                        "--no-sandbox",
+                        "--disable-infobars"
+                    ]
+                },
+                "steps": [
+                    {
+                        "func": "go_to",
+                        "args": {
+                            "url": "https://e-gov.betha.com.br/cdweb/03114-522/contribuinte/rel_cndcontribuinte.faces"
+                        }
+                    },
+                    {
+                        "func": "click",
+                        "args": {
+                            "xpath": "//*[@id='modoAcesso']/div[1]/div[2]/div/div/div/a"
+                        }
+                    },
+                    {
+                        "func": "insert",
+                        "args": {
+                            "xpath": "//*[@id='mainForm:cnpj']",
+                            "text": "19625833000176"
+                        }
+                    },
+                    {
+                        "func": "click",
+                        "args": {
+                            "xpath": "//*[@id='mainForm:btCnpj']"
+                        }
+                    },
+                    {
+                        "func": "switch_page",
+                        "args": {
+                            "xpath": "//*[@id='mainForm:t-contribuinte']/tbody/tr/td[3]/img"
+                        }
+                    },
+                    {
+                        "func": "wait_url_change",
+                        "args": {}
+                    },
+                    {
+                        "func": "page_to_pdf",
+                        "args": {
+                            "path": "/cnd"
+                        }
+                    }
+                ]
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/11.1.0
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.ip }}/execute_scrap"
+        name: Federal
+        meta:
+          id: req_f798f41faa814aecb27cb185d1ccbb9d
+          created: 1769706661650
+          modified: 1770053176300
+          isPrivate: false
+          description: ""
+          sortKey: -1769706661650
+        method: POST
+        body:
+          mimeType: application/json
+          text: >-
+            {
+            	"options": {
+            		"headless": false,
+            		"slow_mo": 550,
+            		"args": [
+            			"--disable-dev-shm-usage",
+            			"--disable-blink-features=AutomationControlled",
+            			"--no-sandbox",
+            			"--disable-infobars"
+            		]
+            	},
+            	"steps": [
+            		{
+            			"func": "go_to",
+            			"args": {
+            				"url": "https://servicos.receitafederal.gov.br/servico/certidoes/#/home/cnpj"
+            			}
+            		},
+            		{
+            			"func": "insert",
+            			"args": {
+            				"xpath": "//input[@name='niContribuinte']",
+            				"text": "24092271000182"
+            			}
+            		},
+            		{
+            			"func": "click",
+            			"args": {
+            				"xpath": "//button[normalize-space(text())='Emitir Certidão']"
+            			}
+            		},
+            		{
+            			"func": "save_file",
+            			"args": {
+            				"xpath": "//button[normalize-space(text())='Emitir Nova Certidão']",
+            				"path": "/pdf"
+            			}
+            		}
+            	]
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/12.3.0
+            description: ""
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.ip }}/execute_scrap"
+        name: Estadual - SC
+        meta:
+          id: req_4461465c9ea9480c820a28098814b573
+          created: 1770053120778
+          modified: 1770055077982
+          isPrivate: false
+          description: ""
+          sortKey: -1770053120778
+        method: POST
+        body:
+          mimeType: application/json
+          text: >-
+            {
+            	"options": {
+            		"headless": false,
+            		"slow_mo": 250,
+            		"args": [
+            			"--disable-dev-shm-usage",
+            			"--disable-blink-features=AutomationControlled",
+            			"--no-sandbox",
+            			"--disable-infobars"
+            		]
+            	},
+            	"steps": [
+            		{
+            			"func": "go_to",
+            			"args": {
+            				"url": "https://sat.sef.sc.gov.br/tax.NET/Sat.CtaCte.Web/SolicitacaoCnd.aspx"
+            			}
+            		},
+            		{
+            			"func": "insert",
+            			"args": {
+            				"xpath": "//*[@id='Body_Main_Main_sepBusca_idnCnd_MaskedField']",
+            				"text": "24092271000182"
+            			}
+            		},
+            		{
+            			"func": "captcha_solver",
+            			"args": {
+            				"api_key": "a7828fac8aea394fa604918d7dc0660d"
+            			}
+            		},
+            		{
+            			"func": "click",
+            			"args": {
+            				"xpath": "//a[.//span[contains(normalize-space(), 'Buscar')]]"
+            			}
+            		},
+            		{
+            			"func": "save_file",
+            			"args": {
+            				"xpath": "//a[.//span[contains(normalize-space(), 'Solicitar nova CND')]]",
+            				"path": "/pdf"
+            			}
+            		}
+            	]
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/12.3.0
+            description: ""
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+cookieJar:
+  name: Default Jar
+  meta:
+    id: jar_35990ac3318c7e28a953529467e52fd26c8c0126
+    created: 1758834763108
+    modified: 1758834763108
+environments:
+  name: Base Environment
+  meta:
+    id: env_35990ac3318c7e28a953529467e52fd26c8c0126
+    created: 1750182757427
+    modified: 1770053152012
+    isPrivate: false
+  data:
+    ip: http://192.168.4.43:5000

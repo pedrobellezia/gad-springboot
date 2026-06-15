@@ -10,5 +10,7 @@ public interface ClienteProjection {
     UUID getUsuarioId();
 
     String getEmpresaId();
+
+    UsuarioProjection getUsuario();
 }
 

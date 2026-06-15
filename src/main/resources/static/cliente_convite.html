@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8"/>
+    <title>Vincular Convite</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link rel="icon" type="image/png" href="/static/img/assets/fav_icon.png"/>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded" rel="stylesheet"/>
+    <link rel="stylesheet" href="/static/css/receber_convite.css">
+    <link rel="stylesheet" href="/static/css/sidebar.css">
+    <link rel="stylesheet" href="/static/css/responsividade.css">
+    <style>
+        .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .popup-content {
+            background: white;
+            border-radius: 1.25rem;
+            padding: 2.5rem;
+            max-width: 580px;
+            width: 90%;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+            position: relative;
+            border: 2px solid #f0f0f0;
+        }
+
+        .popup-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #f5f5f5;
+        }
+
+        .popup-header h2 {
+            color: #843af3;
+            margin: 0;
+            font-size: 1.4rem;
+            font-weight: 700;
+        }
+
+        .popup-close-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: #f5f5f5;
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: #666;
+            transition: all 0.3s ease;
+        }
+
+        .popup-close-btn:hover {
+            background: #843af3;
+            color: white;
+            transform: rotate(90deg);
+        }
+
+        .popup-content label {
+            color: #555;
+            font-weight: 600;
+            font-size: 0.95rem;
+            margin-bottom: -0.5rem;
+        }
+
+        .popup-content input[type="text"] {
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            padding: 0.85rem 1.25rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 0.75rem;
+            font-size: 1rem;
+            color: #333;
+            transition: all 0.3s ease;
+        }
+
+        .popup-content input[type="text"]:focus {
+            border-color: #843af3;
+            outline: none;
+            box-shadow: 0 0 0 4px rgba(132, 58, 243, 0.1);
+        }
+
+        .popup-content button {
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.75rem;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-roxo {
+            background: #843af3;
+            color: white;
+            box-shadow: 0 4px 12px rgba(132, 58, 243, 0.3);
+        }
+        
+        .message-container p.error {
+            color: red;
+            font-weight: 600;
+        }
+        .message-container p.success {
+            color: green;
+            font-weight: 600;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+    <aside class="sidebar expanded" id="sidebar">
+        <div class="logo">
+            <img src="/static/img/assets/logo_GAD_PAINEL.png" alt="Logo" style="width: 80%; height: auto;"/>
+        </div>
+        <nav class="menu-wrapper">
+            <div class="menu">
+                <a href="/painel_cliente" class="menu-item"><span
+                        class="material-symbols-rounded">space_dashboard</span><span class="text">Postagens</span></a>
+                <a href="/cliente_convite" class="menu-item active"><span class="material-symbols-rounded">forward_to_inbox</span><span
+                        class="text">Convites</span></a>
+                <a href="/perfil_cliente" class="menu-item"><span class="material-symbols-rounded">person</span><span
+                        class="text">Perfil</span></a>
+                <a href="/config" class="menu-item"><span class="material-symbols-rounded">settings</span><span
+                        class="text">Configurações</span></a>
+            </div>
+            <div style="margin-top: auto; width: 100%;">
+                <a href="javascript:void(0);" id="logoutBtn" class="menu-item logout">
+                    <span class="material-symbols-rounded">exit_to_app</span>
+                    <span class="text">Sair</span>
+                </a>
+            </div>
+        </nav>
+    </aside>
+
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    <main class="main-content">
+        <header class="header">
+            <button id="toggleBtn" class="toggle-btn"><span class="material-symbols-rounded" id="iconToggle">chevron_left</span>
+            </button>
+            <h1>Vincular Convite</h1>
+            <div class="user-info">
+                <span id="headerUserName">Carregando...</span>
+                <img id="headerUserAvatar" src="/static/img/assets/logo_GAD_HOME.png" class="avatar" alt="Avatar do usuário">
+            </div>
+        </header>
+
+        <section class="modal-section" id="invitationContent">
+            <span class="material-symbols-rounded">forward_to_inbox</span>
+            <p style="color: #666;">Carregando informações do convite...</p>
+        </section>
+    </main>
+</div>
+
+<!-- Modal Vinculação -->
+<div class="popup-overlay" id="popup" style="display: none;">
+    <form id="formVinculacao" class="popup-content">
+        <button type="button" class="popup-close-btn" onclick="fecharPopup()">
+            <span class="material-symbols-rounded">close</span>
+        </button>
+
+        <div class="popup-header">
+            <span class="material-symbols-rounded" style="font-size: 2rem; color: #843af3;">link</span>
+            <h2 style="color: #843af3; margin: 0;">Vincular código do gestor</h2>
+        </div>
+
+        <label for="codigo"><strong>Código do gestor:</strong></label>
+        <input type="text" id="codigo" name="codigo" required>
+
+        <div class="message-container" id="messageContainer"></div>
+
+        <div style="font-size: 0.9rem; margin-top: 10px;">
+            <strong>Instruções para vinculação:</strong>
+            <ul style="padding-left: 1rem; margin-top: 0.5rem;">
+                <li style="margin-bottom: 0.5rem;">O código é fornecido pelo seu gestor;</li>
+                <li style="margin-bottom: 0.5rem;">Você pode se vincular a apenas um único gestor;</li>
+                <li>Utilize o código exatamente como recebido, sem alterações.</li>
+            </ul>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 0.5rem; margin-top: 1rem;">
+            <button type="button" class="btn-cinza" onclick="fecharPopup()">Cancelar</button>
+            <button type="submit" class="btn-roxo">Vincular Agora</button>
+        </div>
+    </form>
+</div>
+
+<!-- Modal Sucesso -->
+<div class="popup-overlay" id="popupSucesso" style="display: none;">
+    <div class="popup-content" style="align-items: center; text-align: center; max-width: 450px;">
+        <button type="button" class="popup-close-btn" onclick="fecharPopupSucesso()">
+            <span class="material-symbols-rounded">close</span>
+        </button>
+        <span class="material-symbols-rounded success-icon" style="font-size: 4rem; color: green;">task_alt</span>
+        <h2 style="color: #333; margin: 0.5rem 0; font-size: 1.8rem; font-weight: 700;">Convite Vinculado!</h2>
+        <p style="margin: 0; color: #666; line-height: 1.6; font-size: 1.05rem;">
+            Seu convite foi vinculado com sucesso. Agora você pode receber postagens do seu gestor.
+        </p>
+        <button class="btn-roxo" onclick="fecharPopupSucesso()" style="margin-top: 0.5rem;">Entendi!</button>
+    </div>
+</div>
+
+<script src="/static/js/sidebar.js"></script>
+<script>
+    const token = localStorage.getItem('token');
+    if (!token) {
+        window.location.href = '/login';
+    }
+
+    const popup = document.getElementById('popup');
+    const popupSucesso = document.getElementById('popupSucesso');
+    const invitationContent = document.getElementById('invitationContent');
+    const formVinculacao = document.getElementById('formVinculacao');
+    const messageContainer = document.getElementById('messageContainer');
+
+    function abrirPopup() {
+        if (popup) popup.style.display = 'flex';
+    }
+
+    function fecharPopup() {
+        if (popup) popup.style.display = 'none';
+        if (formVinculacao) formVinculacao.reset();
+    }
+
+    function fecharPopupSucesso() {
+        if (popupSucesso) popupSucesso.style.display = 'none';
+    }
+
+    function getAvatarUrl(avatar) {
+        if (!avatar || avatar === 'None' || avatar === 'icon_padrao.png') {
+            return '/static/img/assets/logo_GAD_HOME.png'; 
+        }
+        if (avatar.startsWith('http://') || avatar.startsWith('https://')) {
+            return avatar;
+        }
+        return '/static/uploads/' + avatar;
+    }
+
+    let currentUser = null;
+
+    async function loadInvitationDetails() {
+        try {
+            const meRes = await fetch('/me', {
+                headers: { 'Authorization': 'Bearer ' + token }
+            });
+
+            if (!meRes.ok) {
+                localStorage.removeItem('token');
+                window.location.href = '/login';
+                return;
+            }
+
+            currentUser = await meRes.json();
+            document.getElementById('headerUserName').textContent = currentUser.nome;
+            document.getElementById('headerUserAvatar').src = getAvatarUrl(currentUser.avatar);
+
+            // Fetch Cliente details to check company vinculation
+            const clientRes = await fetch('/cliente/' + currentUser.id, {
+                headers: { 'Authorization': 'Bearer ' + token }
+            });
+
+            if (clientRes.ok) {
+                const clientData = await clientRes.json();
+                const empresaId = clientData.empresaId;
+
+                // Se o empresaId for igual ao id padrão inicial ou não configurado
+                if (!empresaId || empresaId === '8e6c703b-c291-4e41-a15d-24f46cb0a4d5' || empresaId === 'UNLINKED' || empresaId.trim() === '') {
+                    invitationContent.innerHTML = `
+                        <span class="material-symbols-rounded">forward_to_inbox</span>
+                        <h2 style="color: #333; margin: 1rem 0 0.5rem 0; font-size: 1.8rem; font-weight: 700;">Vincular Convite</h2>
+                        <p style="color: #666; text-align: center; margin-bottom: 1rem; max-width: 450px; line-height: 1.6;">
+                            Para começar a receber postagens do seu gestor, vincule o código de convite fornecido por ele.
+                        </p>
+                        <button class="btn-roxo" onclick="abrirPopup()">Vincular Agora</button>
+                    `;
+                } else {
+                    invitationContent.innerHTML = `
+                        <div class="convite-info-card" style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); max-width: 500px; width: 100%;">
+                            <div class="convite-info-item" style="margin-bottom: 15px;">
+                                <strong>Código do Convite (Agência)</strong>
+                                <div class="convite-codigo-value" style="font-size: 1.2rem; font-weight: 600; color: #843af3; margin-top: 5px;">${empresaId}</div>
+                            </div>
+                            <div class="convite-info-item">
+                                <strong>Status da Vinculação</strong>
+                                <div class="convite-info-value" style="margin-top: 5px; color: green; font-weight: 600; display: flex; align-items: center; gap: 5px;">
+                                    <span class="material-symbols-rounded">task_alt</span> Ativo
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+            }
+
+        } catch (err) {
+            console.error(err);
+            invitationContent.innerHTML = '<p style="color: red;">Erro ao carregar detalhes do convite.</p>';
+        }
+    }
+
+    formVinculacao.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const codigo = document.getElementById('codigo').value.trim();
+        if (!codigo) return;
+
+        try {
+            const response = await fetch('/cliente/' + currentUser.id, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': 'Bearer ' + token,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    empresaId: codigo
+                })
+            });
+
+            if (response.ok) {
+                fecharPopup();
+                popupSucesso.style.display = 'flex';
+                loadInvitationDetails();
+            } else {
+                messageContainer.innerHTML = '<p class="error">Código de convite inválido ou falha no servidor.</p>';
+            }
+        } catch (err) {
+            console.error(err);
+            messageContainer.innerHTML = '<p class="error">Erro de conexão ao vincular convite.</p>';
+        }
+    });
+
+    // Logout
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        window.location.href = '/login';
+    });
+
+    loadInvitationDetails();
+</script>
+</body>
+</html>

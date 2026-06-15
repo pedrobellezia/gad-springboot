@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+    <link rel="icon" type="image/png" sizes="16x16" href="/static/img/assets/fav_icon.png">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/login_cadastro.css">
+</head>
+<body>
+    <div class="container">
+        <div class="left">
+            <div class="green-bar"></div>
+            <div class="left-content">
+                <h1>Bem-vindo de volta</h1>
+                <p>Acesse sua conta e continue sua jornada conosco.</p>
+            </div>
+        </div>
+        <div class="right">
+            <form action="/process_login" method="POST">
+                <h2>👋 Seja bem-vindo de volta,<br>Faça login para continuar.</h2>
+                <p class="sub">Insira seus dados e acesse a plataforma GAD.</p>
+                {% if erro %}
+                    <div class="error-card">{{erro}}</div>
+                {% endif %}
+
+                <label for="email">Email</label>
+                <input type="email" name="email" placeholder="Digite seu email" required>
+
+                <label for="senha">Senha</label>
+                <input type="password" name="senha" placeholder="Digite sua senha" required>
+
+                <input type="hidden" name="csrf_token" value="{{ request.session.get('CSRF_token') }}">
+
+
+                <div class="form-link" style="text-align: right; margin-top: 5px; margin-bottom: 15px;">
+                    <a href="/recuperar_senha">Esqueceu sua senha?</a>
+                </div>
+
+                <button type="submit">Entrar</button>
+
+                <div class="link">
+                    <p>Não tem uma conta? <a href="/register">Crie aqui</a></p>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

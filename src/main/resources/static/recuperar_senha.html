@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Recuperar Senha</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/css/login_cadastro.css">
+    <link rel="icon" type="image/png" sizes="16x16" href="/static/img/assets/fav_icon.png">
+</head>
+<body>
+    <div class="container">
+        <div class="left"></div>
+        <div class="right">
+            <form id="recoverForm">
+                <div id="errorCard" class="error-card" style="display: none;"></div>
+                <div id="successCard" class="success-card" style="display: none; background-color: #d4edda; color: #155724; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                    Link de recuperação enviado (simulação)! Verifique seu e-mail.
+                </div>
+                <h2>Recuperar Senha</h2>
+                <p class="sub">Digite seu e-mail e o tipo de conta para enviarmos um link de recuperação.</p>
+                <label for="email">Email</label>
+                <input type="email" id="emailField" name="email" placeholder="Digite o e-mail da sua conta" required>
+
+                <button type="submit">Gerar Link de Recuperação</button>
+                 <div class="link">
+                    <p>Lembrou a senha? <a href="/login">Faça login</a></p>
+                </div>
+            </form>
+        </div>
+    </div>
+    <script>
+        document.getElementById('recoverForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const successCard = document.getElementById('successCard');
+            successCard.style.display = 'block';
+            document.getElementById('emailField').value = '';
+        });
+    </script>
+</body>
+</html>

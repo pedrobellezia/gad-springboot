@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Painel Cliente</title>
+    <link rel="icon" type="image/png" sizes="16x16" href="/static/img/assets/fav_icon.png">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+          rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded" rel="stylesheet"/>
+    <link rel="stylesheet" href="/static/css/painel_gestor.css">
+    <link rel="stylesheet" href="/static/css/painel_cliente.css">
+    <link rel="stylesheet" href="/static/css/sidebar.css">
+    <link rel="stylesheet" href="/static/css/exclusaopopup.css">
+    <link rel="stylesheet" href="/static/css/viewcard.css">
+    <link rel="stylesheet" href="/static/css/responsividade.css">
+    <link rel="stylesheet" href="/static/css/error_popup.css">
+    <style>
+        .postagem-card {
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .postagem-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <aside class="sidebar expanded" id="sidebar">
+            <div class="logo">
+                <img src="/static/img/assets/logo_GAD_PAINEL.png" alt="Logo" style="width: 80%; height: auto;"/>
+            </div>
+            <nav class="menu-wrapper">
+                <div class="menu">
+                    <a href="/painel_cliente" class="menu-item active"><span
+                            class="material-symbols-rounded">space_dashboard</span><span
+                            class="text">Postagens</span></a>
+                    <a href="/cliente_convite" class="menu-item"><span
+                            class="material-symbols-rounded">forward_to_inbox</span><span
+                            class="text">Convites</span></a>
+                    <a href="/perfil_cliente" class="menu-item"><span class="material-symbols-rounded">Person</span><span
+                            class="text">Perfil</span></a>
+                    <a href="/config" class="menu-item"><span
+                            class="material-symbols-rounded">settings</span><span class="text">Configurações</span></a>
+                </div>
+                <div style="margin-top: auto; width: 100%;">
+                    <a href="javascript:void(0);" id="logoutBtn" class="menu-item logout">
+                        <span class="material-symbols-rounded">exit_to_app</span>
+                        <span class="text">Sair</span>
+                    </a>
+                </div>
+            </nav>
+        </aside>
+
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
+        <main class="main-content">
+            <header class="header">
+                <button id="toggleBtn" class="toggle-btn">
+                    <span class="material-symbols-rounded" id="iconToggle">chevron_left</span>
+                </button>
+                <h1>Postagens</h1>
+                <div class="user-info">
+                    <span id="headerUserName">Carregando...</span>
+                    <img id="headerUserAvatar" src="/static/img/assets/logo_GAD_HOME.png" class="avatar" alt="Avatar">
+                </div>
+            </header>
+
+            <section class="postagens-grid" id="postagensGrid">
+                <div style="text-align: center; width: 100%; padding: 2rem;">
+                    <p style="color: #666;">Carregando postagens...</p>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Modal de Visualização -->
+    <div id="modal-visualizacao" class="modal-visualizacao">
+        <div class="modal-visualizacao-conteudo">
+            <button class="fechar-modal-visualizacao" onclick="fecharModalVisualizacao()">
+                <span class="material-symbols-rounded closing-modal">close</span>
+            </button>
+
+            <!-- Carrossel de Mídias - Esquerda -->
+            <div class="modal-visualizacao-media">
+                <div class="carousel-container" id="carousel-container">
+                    <button class="carousel-btn prev" id="carousel-prev">
+                        <span class="material-symbols-rounded">chevron_left</span>
+                    </button>
+                    <div class="carousel-track" id="carousel-track"></div>
+                    <button class="carousel-btn next" id="carousel-next">
+                        <span class="material-symbols-rounded">chevron_right</span>
+                    </button>
+                    <div class="carousel-indicators" id="carousel-indicators"></div>
+                </div>
+            </div>
+
+            <!-- Informações - Direita -->
+            <div class="modal-visualizacao-info">
+                <div class="status-section">
+                    <span class="status-badge" id="view-status"></span>
+                </div>
+
+                <h2 id="view-titulo"></h2>
+                <p id="view-descricao" style="white-space: pre-wrap; margin-top: 15px; color: #4b5563; line-height: 1.6;"></p>
+
+                <div class="info-divider"></div>
+
+                <div class="info-item">
+                    <span class="material-symbols-rounded">category</span>
+                    <div class="info-item-content">
+                        <div class="info-item-label">Total de Mídias</div>
+                        <div class="info-item-value" id="view-media-count">0</div>
+                    </div>
+                </div>
+
+                <div class="info-item">
+                    <span class="material-symbols-rounded">schedule</span>
+                    <div class="info-item-content">
+                        <div class="info-item-label">Criado Em</div>
+                        <div class="info-item-value">Recentemente</div>
+                    </div>
+                </div>
+
+                <!-- Botões de Ação do Cliente -->
+                <div class="modal-actions">
+                    <div class="modal-actions-cliente" id="modal-actions-cliente">
+                        <div class="modal-actions-row">
+                            <button class="modal-btn btn-aprovar-modal" id="btn-aprovar-post">
+                                <span class="material-symbols-rounded">check_circle</span>
+                                Aprovar
+                            </button>
+                            <button class="modal-btn btn-reprovar-modal" id="btn-reprovar-post" style="background: #dc2626;">
+                                <span class="material-symbols-rounded">cancel</span>
+                                Reprovar
+                            </button>
+                            <button class="modal-btn" id="btn-alterar-post" style="background: #f59e0b; color: white;">
+                                <span class="material-symbols-rounded">edit_note</span>
+                                Solicitar Alteração
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pop-up de Confirmação de Ação (Aprovar / Reprovar) -->
+    <div id="popup-confirmacao" class="popupdelete-overlay">
+        <div class="popupdelete-conteudo">
+            <button type="button" class="popupdelete-fechar" onclick="fecharConfirmacaoPopup()">
+                <span class="material-symbols-rounded">close</span>
+            </button>
+
+            <div id="confirmacao-icone" class="popupdelete-icone" style="color: #843af3; border-color: #843af3;">
+                <span class="material-symbols-rounded">help</span>
+            </div>
+
+            <h2 id="confirmacao-titulo">Confirmar Ação</h2>
+            <p id="confirmacao-texto">Deseja alterar o status desta postagem?</p>
+
+            <div class="popupdelete-botoes">
+                <button type="button" class="popupdelete-botao-cancelar" onclick="fecharConfirmacaoPopup()">Cancelar</button>
+                <button type="button" class="popupdelete-botao-confirmar" id="btnConfirmarAcao" style="background-color: #843af3; color: white;">
+                    Confirmar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pop-up de Alerta Personalizado (Sucesso / Erro) -->
+    <div id="popup-alerta" class="popupdelete-overlay">
+        <div class="popupdelete-conteudo">
+            <button type="button" class="popupdelete-fechar" onclick="fecharAlertaPopup()">
+                <span class="material-symbols-rounded">close</span>
+            </button>
+
+            <div id="alerta-icone" class="popupdelete-icone">
+                <span id="alerta-icone-span" class="material-symbols-rounded">check_circle</span>
+            </div>
+
+            <h2 id="alerta-titulo">Sucesso!</h2>
+            <p id="alerta-texto">Mensagem de alerta...</p>
+
+            <div class="popupdelete-botoes">
+                <button type="button" id="alerta-btn-ok" class="popupdelete-botao-confirmar" onclick="fecharAlertaPopup()" style="background-color: #843af3; color: white;">
+                    OK
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/js/sidebar.js"></script>
+    <script>
+        const token = localStorage.getItem('token');
+        if (!token) {
+            window.location.href = '/login';
+        }
+
+        const modalView = document.getElementById('modal-visualizacao');
+        const carouselTrack = document.getElementById('carousel-track');
+        const carouselPrev = document.getElementById('carousel-prev');
+        const carouselNext = document.getElementById('carousel-next');
+        const carouselIndicators = document.getElementById('carousel-indicators');
+        const viewTitulo = document.getElementById('view-titulo');
+        const viewDescricao = document.getElementById('view-descricao');
+        const viewStatus = document.getElementById('view-status');
+        const viewMediaCount = document.getElementById('view-media-count');
+        
+        const btnAprovarPost = document.getElementById('btn-aprovar-post');
+        const btnReprovarPost = document.getElementById('btn-reprovar-post');
+
+        const confirmacaoPopup = document.getElementById('popup-confirmacao');
+        const confirmacaoTexto = document.getElementById('confirmacao-texto');
+        const btnConfirmarAcao = document.getElementById('btnConfirmarAcao');
+        let pendingStatusChange = null;
+
+        function abrirConfirmacao(status) {
+            pendingStatusChange = status;
+            confirmacaoTexto.textContent = `Deseja alterar o status desta postagem para ${status}?`;
+            confirmacaoPopup.classList.add('popupdelete-visivel');
+        }
+
+        function fecharConfirmacaoPopup() {
+            confirmacaoPopup.classList.remove('popupdelete-visivel');
+            pendingStatusChange = null;
+        }
+
+        btnConfirmarAcao.addEventListener('click', () => {
+            if (pendingStatusChange) {
+                executeStatusUpdate(pendingStatusChange);
+                fecharConfirmacaoPopup();
+            }
+        });
+
+        const alertaPopup = document.getElementById('popup-alerta');
+        const alertaIconeSpan = document.getElementById('alerta-icone-span');
+        const alertaIconeDiv = document.getElementById('alerta-icone');
+        const alertaTitulo = document.getElementById('alerta-titulo');
+        const alertaTexto = document.getElementById('alerta-texto');
+        const alertaBtnOk = document.getElementById('alerta-btn-ok');
+
+        function mostrarAlerta(titulo, texto, isSuccess) {
+            alertaTitulo.textContent = titulo;
+            alertaTexto.textContent = texto;
+            if (isSuccess) {
+                alertaIconeSpan.textContent = 'check_circle';
+                alertaIconeDiv.style.color = '#4ce68b';
+                alertaIconeDiv.style.borderColor = '#4ce68b';
+                alertaBtnOk.style.backgroundColor = '#843af3';
+            } else {
+                alertaIconeSpan.textContent = 'cancel';
+                alertaIconeDiv.style.color = '#ef4444';
+                alertaIconeDiv.style.borderColor = '#ef4444';
+                alertaBtnOk.style.backgroundColor = '#ef4444';
+            }
+            alertaPopup.classList.add('popupdelete-visivel');
+        }
+
+        function fecharAlertaPopup() {
+            alertaPopup.classList.remove('popupdelete-visivel');
+        }
+
+        let currentIndex = 0;
+        let totalSlides = 0;
+        let currentPost = null;
+        let postsMap = {};
+
+        function getAvatarUrl(avatar) {
+            if (!avatar || avatar === 'None' || avatar === 'icon_padrao.png') {
+                return '/static/img/assets/logo_GAD_HOME.png'; 
+            }
+            if (avatar.startsWith('http://') || avatar.startsWith('https://')) {
+                return avatar;
+            }
+            return '/static/uploads/' + avatar;
+        }
+
+        const updateCarousel = () => {
+            carouselTrack.style.transform = `translateX(-${currentIndex * 100}%)`;
+            const indicators = carouselIndicators.querySelectorAll('.carousel-indicator');
+            indicators.forEach((indicator, idx) => {
+                indicator.classList.toggle('active', idx === currentIndex);
+            });
+
+            carouselPrev.style.display = totalSlides > 1 ? 'flex' : 'none';
+            carouselNext.style.display = totalSlides > 1 ? 'flex' : 'none';
+            carouselIndicators.style.display = totalSlides > 1 ? 'flex' : 'none';
+        };
+
+        carouselPrev.addEventListener('click', () => {
+            currentIndex = (currentIndex - 1 + totalSlides) % totalSlides;
+            updateCarousel();
+        });
+
+        carouselNext.addEventListener('click', () => {
+            currentIndex = (currentIndex + 1) % totalSlides;
+            updateCarousel();
+        });
+
+        function fecharModalVisualizacao() {
+            modalView.classList.remove('visivel');
+            const videos = carouselTrack.querySelectorAll('video');
+            videos.forEach(video => video.pause());
+            currentIndex = 0;
+            currentPost = null;
+        }
+
+        // Abrir Modal
+        function abrirModalVisualizacao(postId) {
+            currentPost = postsMap[postId];
+            if (!currentPost) return;
+
+            // Extrair titulo e descricao do conteudo
+            const lines = currentPost.conteudo.split('\n');
+            const titulo = lines[0] || 'Postagem';
+            const descricao = lines.slice(1).join('\n').trim() || currentPost.conteudo;
+
+            viewTitulo.textContent = titulo;
+            viewDescricao.textContent = descricao;
+
+            // Status badge
+            const status = currentPost.status;
+            const statusClass = 'status-' + status.toLowerCase();
+            viewStatus.className = 'status-badge ' + statusClass;
+            viewStatus.textContent = status;
+
+            // Controle de Botões baseado no Status
+            const modalActions = document.getElementById('modal-actions-cliente');
+            if (status === 'APROVADO' || status === 'REJEITADO') {
+                modalActions.style.display = 'none';
+            } else {
+                modalActions.style.display = 'block';
+            }
+
+            // Carousel mídias
+            carouselTrack.innerHTML = '';
+            carouselIndicators.innerHTML = '';
+            currentIndex = 0;
+
+            const medias = currentPost.medias || [];
+            if (medias.length > 0) {
+                totalSlides = medias.length;
+                viewMediaCount.textContent = `${medias.length} mídia${medias.length > 1 ? 's' : ''}`;
+
+                medias.forEach((media, index) => {
+                    const caminho = getAvatarUrl(media.url || media.path);
+                    const slide = document.createElement('div');
+                    slide.className = 'carousel-slide';
+
+                    if (media.tipo === 'VIDEO') {
+                        const video = document.createElement('video');
+                        video.src = caminho;
+                        video.controls = true;
+                        video.loop = true;
+                        slide.appendChild(video);
+                    } else {
+                        const img = document.createElement('img');
+                        img.src = caminho;
+                        img.alt = titulo;
+                        slide.appendChild(img);
+                    }
+
+                    carouselTrack.appendChild(slide);
+
+                    // Indicator
+                    const indicator = document.createElement('div');
+                    indicator.className = 'carousel-indicator';
+                    if (index === 0) indicator.classList.add('active');
+                    indicator.addEventListener('click', () => {
+                        currentIndex = index;
+                        updateCarousel();
+                    });
+                    carouselIndicators.appendChild(indicator);
+                });
+            } else {
+                totalSlides = 1;
+                viewMediaCount.textContent = 'Sem mídias';
+                const slide = document.createElement('div');
+                slide.className = 'carousel-slide';
+                slide.innerHTML = '<p style="color: white; font-size: 1.2rem;">Sem mídia disponível</p>';
+                carouselTrack.appendChild(slide);
+            }
+
+            updateCarousel();
+            modalView.classList.add('visivel');
+        }
+
+        // Ações de Aprovação / Reprovação
+        async function executeStatusUpdate(status) {
+            if (!currentPost) return;
+
+            try {
+                const response = await fetch(`/posts/${currentPost.id}/status`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': 'Bearer ' + token,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ status })
+                });
+
+                if (response.ok) {
+                    fecharModalVisualizacao();
+                    mostrarAlerta('Sucesso!', 'Status atualizado com sucesso.', true);
+                    loadDashboard();
+                } else {
+                    mostrarAlerta('Erro!', 'Erro ao atualizar status.', false);
+                }
+            } catch (err) {
+                console.error(err);
+                mostrarAlerta('Erro!', 'Erro ao conectar com o servidor.', false);
+            }
+        }
+
+        btnAprovarPost.addEventListener('click', () => abrirConfirmacao('APROVADO'));
+        btnReprovarPost.addEventListener('click', () => abrirConfirmacao('REJEITADO'));
+        document.getElementById('btn-alterar-post').addEventListener('click', () => abrirConfirmacao('ALTERACAO_PENDENTE'));
+
+        // Carregar posts
+        async function loadDashboard() {
+            try {
+                // Obter dados do usuario
+                const meRes = await fetch('/me', {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                if (!meRes.ok) {
+                    localStorage.removeItem('token');
+                    window.location.href = '/login';
+                    return;
+                }
+                const user = await meRes.json();
+                document.getElementById('headerUserName').textContent = user.nome;
+                document.getElementById('headerUserAvatar').src = getAvatarUrl(user.avatar);
+
+                // Obter postagens do cliente
+                const postsRes = await fetch(`/cliente/${user.id}/posts`, {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+
+                const grid = document.getElementById('postagensGrid');
+                grid.innerHTML = '';
+
+                if (postsRes.ok) {
+                    const posts = await postsRes.json();
+
+                    if (posts.length === 0) {
+                        grid.innerHTML = `
+                            <div style="text-align: center; width: 100%; padding: 2rem;">
+                                <img src="/static/img/assets/sem_gestor_feedback.png" alt="Sem postagens" style="width: 200px; opacity: 0.6;" />
+                                <p style="margin-top: 1rem; font-size: 1.1rem; color: #666;">Nenhuma postagem disponível do seu gestor ainda.</p>
+                            </div>
+                        `;
+                        return;
+                    }
+
+                    // Carregar mídias de cada post em paralelo
+                    const promises = posts.map(async (post) => {
+                        const mediaRes = await fetch(`/posts/${post.id}/medias`, {
+                            headers: { 'Authorization': 'Bearer ' + token }
+                        });
+                        const medias = mediaRes.ok ? await mediaRes.json() : [];
+                        post.medias = medias;
+                        postsMap[post.id] = post;
+                        return post;
+                    });
+
+                    const populatedPosts = await Promise.all(promises);
+
+                    populatedPosts.forEach((post) => {
+                        const lines = post.conteudo.split('\n');
+                        const titulo = lines[0] || 'Postagem';
+                        const statusClass = 'status-' + post.status.toLowerCase();
+                        const primeiraMedia = post.medias && post.medias[0];
+
+                        const card = document.createElement('div');
+                        card.className = 'postagem-card visualizavel';
+                        card.addEventListener('click', () => abrirModalVisualizacao(post.id));
+
+                        let miniaturaHTML = '';
+                        if (primeiraMedia) {
+                            const caminho = getAvatarUrl(primeiraMedia.url || primeiraMedia.path);
+                            if (primeiraMedia.tipo === 'VIDEO') {
+                                miniaturaHTML = `<video src="${caminho}" muted loop class="miniatura"></video>`;
+                            } else {
+                                miniaturaHTML = `<img src="${caminho}" alt="${titulo}" class="miniatura">`;
+                            }
+                        }
+
+                        card.innerHTML = `
+                            ${miniaturaHTML}
+                            <div class="postagem-header">
+                                <h3>${titulo}</h3>
+                            </div>
+                            <div class="postagem-footer">
+                                <div class="data" style="display: flex; flex-direction: row">
+                                    <span class="material-symbols-rounded" style="font-size: 14px; vertical-align: middle;">schedule</span>
+                                    Criado recentemente
+                                </div>
+                                <span class="status-badge ${statusClass}">${post.status}</span>
+                            </div>
+                        `;
+                        grid.appendChild(card);
+                    });
+                } else {
+                    grid.innerHTML = '<p style="color: red; text-align: center; width:100%">Erro ao carregar postagens.</p>';
+                }
+
+            } catch (err) {
+                console.error(err);
+                document.getElementById('postagensGrid').innerHTML = '<p style="color: red; text-align: center; width:100%">Erro ao carregar postagens.</p>';
+            }
+        }
+
+        // Logout
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.location.href = '/login';
+        });
+
+        loadDashboard();
+    </script>
+</body>
+
+</html>

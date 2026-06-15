@@ -1,0 +1,1710 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Postagens - GAD</title>
+    <link rel="icon" type="image/png" sizes="16x16" href="/static/img/assets/fav_icon.png">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded" rel="stylesheet"/>
+    <link rel="stylesheet" href="/static/css/sidebar.css">
+    <link rel="stylesheet" href="/static/css/painel_gestor.css">
+    <link rel="stylesheet" href="/static/css/criacao_postagem.css">
+    <link rel="stylesheet" href="/static/css/exclusaopopup.css">
+    <link rel="stylesheet" href="/static/css/viewcard.css">
+    <link rel="stylesheet" href="/static/css/responsividade.css">
+
+    <style>
+        h1 {
+            font-weight: 600;
+        }
+
+        * {
+            letter-spacing: 0.001rem;
+        }
+
+        /* Cards de Postagem - Estilo Melhorado */
+        .postagem-card {
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            border: 1px solid #f0f0f0;
+        }
+
+        .postagem-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 24px rgba(132, 58, 243, 0.15);
+            border-color: #843af3;
+        }
+
+        .postagem-card h3 {
+            margin: 0;
+            color: #1a1a1a;
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+
+        .postagem-card p {
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .postagem-card img.miniatura,
+        .postagem-card video.miniatura {
+            width: 100%;
+            height: 220px;
+            object-fit: cover;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        }
+
+        .texto-truncado {
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            -webkit-line-clamp: 3;
+            line-clamp: 3;
+            min-height: 60px;
+        }
+
+        .card-conteudo {
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .postagem-header {
+            padding: 1.25rem 1.5rem 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .postagem-footer {
+            padding: 0 1.5rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: auto;
+        }
+
+        .data {
+            font-size: 0.875rem;
+            color: #999;
+            font-weight: 500;
+        }
+
+        .status-badge {
+            padding: 0.375rem 1rem;
+            border-radius: 20px;
+            font-size: 0.813rem;
+            font-weight: 600;
+            text-transform: capitalize;
+        }
+
+        .status-pendente {
+            background: linear-gradient(135deg, #FFF4E6 0%, #FFE0B2 100%);
+            color: #E65100;
+        }
+
+        .status-aprovado {
+            background: linear-gradient(135deg, #E8F5E9 0%, #C8E6C9 100%);
+            color: #2E7D32;
+        }
+
+        .status-rejeitado {
+            background: linear-gradient(135deg, #FFEBEE 0%, #FFCDD2 100%);
+            color: #C62828;
+        }
+
+        .status-edicao_solicitada,
+        .status-edicao-solicitada {
+            background: linear-gradient(135deg, #E3F2FD 0%, #BBDEFB 100%);
+            color: #1565C0;
+        }
+
+        /* Modal de Visualização - Estilo Melhorado */
+        .modal-visualizacao {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(8px);
+            z-index: 10000;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        .modal-visualizacao.visivel {
+            display: flex;
+        }
+
+        .modal-visualizacao-conteudo {
+            background: white;
+            border-radius: 24px;
+            max-width: 1200px;
+            width: 95%;
+            max-height: 90vh;
+            display: flex;
+            overflow: hidden;
+            position: relative;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        /* Carrossel de Mídias - Lado Esquerdo */
+        .modal-visualizacao-media {
+            flex: 1;
+            background: #000;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 500px;
+            overflow: hidden;
+        }
+
+        .carousel-container {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .carousel-track {
+            display: flex;
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            height: 100%;
+            align-items: center;
+        }
+
+        .carousel-slide {
+            min-width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .carousel-slide img,
+        .carousel-slide video {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            border-radius: 8px;
+        }
+
+        .carousel-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            z-index: 10;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .carousel-btn:hover {
+            background: white;
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .carousel-btn.prev {
+            left: 1rem;
+        }
+
+        .carousel-btn.next {
+            right: 1rem;
+        }
+
+        .carousel-btn .material-symbols-rounded {
+            font-size: 28px;
+            color: #333;
+        }
+
+        .carousel-indicators {
+            position: absolute;
+            bottom: 1.5rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 8px;
+            z-index: 10;
+        }
+
+        .carousel-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .carousel-indicator.active {
+            width: 24px;
+            border-radius: 4px;
+            background: white;
+        }
+
+        /* Botão de remover mídia no carousel */
+        .btn-remover-media {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: rgba(255, 82, 82, 0.9);
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            z-index: 20;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn-remover-media:hover {
+            background: rgba(211, 47, 47, 1);
+            transform: scale(1.1);
+        }
+
+        .btn-remover-media .material-symbols-rounded {
+            font-size: 20px;
+            color: white;
+            display: flex;
+            justify-content: center;
+        }
+
+        /* Informações - Lado Direito */
+        .modal-visualizacao-info {
+            flex: 0 0 450px;
+            padding: 2.5rem;
+            display: flex;
+            flex-direction: column;
+            background: #fafafa;
+            overflow-y: auto;
+        }
+
+        .modal-visualizacao-info h2 {
+            margin: 0 0 1rem;
+            color: #1a1a1a;
+            font-size: 1.75rem;
+            font-weight: 700;
+            line-height: 1.3;
+        }
+
+        .modal-visualizacao-info .status-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-visualizacao-info p {
+            color: #555;
+            line-height: 1.8;
+            font-size: 1rem;
+            margin: 0 0 2rem;
+        }
+
+        .info-divider {
+            height: 1px;
+            background: #e0e0e0;
+            margin: 1.5rem 0;
+        }
+
+        .info-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: white;
+            border-radius: 12px;
+            margin-bottom: 10px;
+        }
+
+        button.btn-remover-preview > span.material-symbols-rounded {
+            display: flex;
+            justify-content: center;
+        }
+
+
+        .info-item .material-symbols-rounded {
+            color: #843af3;
+            font-size: 22px;
+        }
+
+        .info-item-content {
+            flex: 1;
+        }
+
+        .info-item-label {
+            font-size: 0.75rem;
+            color: #999;
+            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .info-item-value {
+            font-size: 0.95rem;
+            color: #333;
+            font-weight: 500;
+        }
+
+        /* Botões de Ação */
+        .modal-actions {
+            margin-top: auto;
+            padding-top: 2rem;
+            display: flex;
+            gap: 12px;
+        }
+
+        .modal-btn {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.3s;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        .modal-btn .material-symbols-rounded {
+            font-size: 20px;
+        }
+
+        .btn-editar-modal {
+            background: linear-gradient(135deg, #843af3, #6a2fc7);
+            color: white;
+        }
+
+        .btn-editar-modal:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(132, 58, 243, 0.4);
+        }
+
+        .btn-excluir-modal {
+            background: linear-gradient(135deg, #ff5252, #d32f2f);
+            color: white;
+        }
+
+        .btn-excluir-modal:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 82, 82, 0.4);
+        }
+
+        .btn-cancelar-modal {
+            background: linear-gradient(135deg, #9e9e9e, #757575);
+            color: white;
+        }
+
+        .btn-cancelar-modal:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(158, 158, 158, 0.4);
+        }
+
+        .btn-salvar-modal {
+            background: linear-gradient(135deg, #2196f3, #1976d2);
+            color: white;
+        }
+
+        .btn-salvar-modal:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(33, 150, 243, 0.4);
+        }
+
+        /* Campo de upload de imagens no modo edição */
+        .upload-imagens-container {
+            margin-top: 1.5rem;
+            padding: 1.5rem;
+            background: white;
+            border-radius: 12px;
+            border: 2px dashed #843af3;
+            display: none;
+        }
+
+        .upload-imagens-container.ativo {
+            display: block;
+        }
+
+        .upload-imagens-label {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            padding: 2rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-radius: 8px;
+        }
+
+        .upload-imagens-label:hover {
+            background: #f5f0ff;
+        }
+
+        .upload-imagens-label .material-symbols-rounded {
+            font-size: 48px;
+            color: #843af3;
+        }
+
+        .upload-imagens-label span {
+            color: #666;
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        .upload-imagens-input {
+            display: none;
+        }
+
+        .preview-imagens-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            margin-top: 1rem;
+        }
+
+        .preview-imagem-item {
+            position: relative;
+            width: 100px;
+            height: 100px;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 2px solid #e0e0e0;
+        }
+
+        .preview-imagem-item img,
+        .preview-imagem-item video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .preview-imagem-item .btn-remover-preview {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            background: rgba(255, 82, 82, 0.9);
+            border: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .preview-imagem-item .btn-remover-preview:hover {
+            background: rgba(211, 47, 47, 1);
+            transform: scale(1.1);
+        }
+
+        .preview-imagem-item .btn-remover-preview .material-symbols-rounded {
+            font-size: 16px;
+            color: white;
+        }
+
+        .fechar-modal-visualizacao {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            background: white;
+            border: none;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .fechar-modal-visualizacao:hover {
+            background: #f5f5f5;
+        }
+
+        .fechar-modal-visualizacao .material-symbols-rounded {
+            font-size: 24px;
+            color: #666;
+            display: flex;
+            justify-content: center;
+        }
+
+        /* Responsivo */
+        @media (max-width: 968px) {
+            .modal-visualizacao-conteudo {
+                flex-direction: column;
+                max-height: 95vh;
+            }
+
+            .modal-visualizacao-media {
+                min-height: 300px;
+                flex: 0 0 300px;
+            }
+
+            .modal-visualizacao-info {
+                flex: 1;
+                max-height: none;
+            }
+        }
+
+        /* Botão Flutuante */
+        .btn-flutuante {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #843af3, #6a2fc7);
+            border: none;
+            box-shadow: 0 4px 12px rgba(132, 58, 243, 0.3);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            z-index: 999;
+        }
+
+        .btn-flutuante:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(132, 58, 243, 0.5);
+        }
+
+        .btn-flutuante .material-symbols-rounded {
+            color: white;
+            font-size: 32px;
+        }
+
+        /* Modal de Criação */
+        .modal-criar {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-criar.show {
+            display: flex;
+        }
+
+        .modal-criar-conteudo {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .fechar-modal {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            font-size: 2rem;
+            cursor: pointer;
+            color: #666;
+            line-height: 1;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .fechar-modal:hover {
+            background-color: #f0f0f0;
+        }
+
+        .modal-criar h2 {
+            margin-top: 0;
+            margin-bottom: 1.5rem;
+            color: #333;
+            font-size: 1.5rem;
+        }
+
+        .modal-criar form {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .modal-criar label {
+            font-weight: 600;
+            color: #555;
+            font-size: 0.95rem;
+        }
+
+        .modal-criar input[type="text"],
+        .modal-criar textarea,
+        .modal-criar select {
+            padding: 0.75rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 1rem;
+            transition: border-color 0.2s;
+        }
+
+        .modal-criar input[type="text"]:focus,
+        .modal-criar textarea:focus,
+        .modal-criar select:focus {
+            outline: none;
+            border-color: #843af3;
+        }
+
+        .modal-criar input[type="file"] {
+            padding: 0.5rem;
+            border: 2px dashed #e0e0e0;
+            border-radius: 8px;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            cursor: pointer;
+        }
+
+        .btn-submit {
+            background: linear-gradient(135deg, #843af3, #6a2fc7);
+            color: white;
+            border: none;
+            padding: 0.875rem 1.5rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 0.5rem;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(132, 58, 243, 0.3);
+        }
+
+        @media (max-width: 768px) {
+            .btn-flutuante {
+                bottom: 1rem;
+                right: 1rem;
+                width: 50px;
+                height: 50px;
+            }
+
+            .btn-flutuante .material-symbols-rounded {
+                font-size: 28px;
+            }
+
+            .modal-criar-conteudo {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+<div class="container">
+    <aside class="sidebar expanded" id="sidebar">
+        <div class="logo">
+            <img src="/static/img/assets/logo_GAD_PAINEL.png" alt="Logo" style="width: 80%; height: auto;">
+        </div>
+        <nav class="menu-wrapper">
+            <div class="menu">
+                <a href="/dashboard" class="menu-item"><span
+                        class="material-symbols-rounded">space_dashboard</span><span class="text">Dashboard</span></a>
+                <a href="/convites" class="menu-item"><span
+                        class="material-symbols-rounded">forward_to_inbox</span><span class="text">Convites</span></a>
+                <a href="/perfil" class="menu-item"><span class="material-symbols-rounded">person</span><span
+                        class="text">Perfil</span></a>
+                <a href="/config" class="menu-item"><span class="material-symbols-rounded">settings</span><span
+                        class="text">Configurações</span></a>
+            </div>
+            <div style="margin-top: auto; width: 100%;">
+                <a href="/logout" class="menu-item logout"><span
+                        class="material-symbols-rounded">exit_to_app</span><span class="text">Sair</span></a>
+            </div>
+        </nav>
+    </aside>
+
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <main class="main-content">
+        <header class="header">
+            <button id="toggleBtn" class="toggle-btn">
+                <span class="material-symbols-rounded" id="iconToggle">chevron_left</span>
+            </button>
+            <h1>Postagens</h1>
+            <div class="user-info">
+                <span>{{ usuario.nome }}</span>
+                <img src="/static/img/avatar/{{ usuario.avatar }}" class="avatar" alt="Avatar">
+            </div>
+        </header>
+
+        <section class="postagem-grid">
+            {% if not postagens %}
+                <div style="text-align: center; width: 100%; padding: 2rem;">
+                    <img src="/static/img/assets/sem_cliente_feedback.png" alt="Sem postagens"
+                         style="width: 200px; opacity: 0.6;">
+                    <p style="margin-top: 1rem; font-size: 1.1rem; color: #666;">
+                        Nenhuma postagem foi criada ainda.
+                    </p>
+                </div>
+            {% else %}
+                {% for postagem in postagens %}
+                    {% set statusClass = 'status-' + (postagem.status|lower|replace(' ', '-')) %}
+                    {% set primeira_media = postagem.medias[0] if postagem.medias else none %}
+
+                    <div class="postagem-card visualizavel"
+                         data-post-id="{{ postagem.codigo }}">
+
+                        {% if primeira_media %}
+                            {% if primeira_media.tipo == 'video' %}
+                                <video src="/static/uploads/{{ primeira_media.path }}" muted loop
+                                       class="miniatura"></video>
+                            {% else %}
+                                <img src="/static/uploads/{{ primeira_media.path }}" alt="{{ postagem.titulo }}"
+                                     class="miniatura">
+                            {% endif %}
+                        {% endif %}
+
+                        <div class="postagem-header">
+                            <h3>{{ postagem.titulo }}</h3>
+                        </div>
+
+                        <div class="postagem-footer">
+                            <div class="data" style="display: flex; flex-direction: row">
+                                <span class="material-symbols-rounded" style="font-size: 14px; vertical-align: middle;">schedule</span>
+                                Criado recentemente
+                            </div>
+                            <span class="status-badge {{ statusClass }}">{{ postagem.status }}</span>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </section>
+    </main>
+</div>
+
+<!-- Botão Flutuante para Criar Postagem -->
+<button id="btn-flutuante" class="btn-flutuante" title="Criar Postagem" aria-label="Criar nova postagem">
+    <span class="material-symbols-rounded">add</span>
+</button>
+
+<!-- Modal para Criar Postagem -->
+<div id="modal-criar-postagem" class="modal-criar">
+    <div class="modal-criar-conteudo">
+        <button id="fechar-modal-criar" class="fechar-modal" aria-label="Fechar">&times;</button>
+        <h2>Criar Nova Postagem</h2>
+
+        <form id="form-criar-postagem" action="/postagem/criar" method="POST" enctype="multipart/form-data">
+            <input type="hidden" name="csrf_token" value="{{ request.session.CSRF_token }}">
+            <input type="hidden" id="id_redator" name="id_redator" value="{{ usuario.id }}">
+            <input type="hidden" id="id_cliente" name="id_cliente" value="{{ cliente_id }}">
+
+            <label for="titulo">Título *</label>
+            <input type="text" id="titulo" name="titulo" required maxlength="150" placeholder="Título da postagem">
+
+            <label for="conteudo">Conteúdo *</label>
+            <textarea id="conteudo" name="conteudo" required rows="5" placeholder="Descreva a postagem..."></textarea>
+
+            <label for="files">Mídias (JPEG, MP4, MOV)</label>
+            <input type="file" id="files" name="files" accept="image/jpeg,video/mp4,video/quicktime" multiple>
+            <small style="color: #666; font-size: 0.875rem; margin-top: -0.5rem; display: block;">
+                JPEG (max 8MB) | MP4/MOV (max 100MB)
+            </small>
+
+            <button type="submit" class="btn-submit">Criar Postagem</button>
+        </form>
+    </div>
+</div>
+
+<!-- Modal de Exclusão -->
+<div id="popupdelete-overlay" class="popupdelete-overlay">
+    <div class="popupdelete-conteudo">
+        <button class="popupdelete-fechar">
+            <span class="material-symbols-rounded">close</span>
+        </button>
+
+        <div class="popupdelete-icone popupdelete-cor-icone-perigo">
+            <span class="material-symbols-rounded">delete_forever</span>
+        </div>
+
+        <h2>Tem certeza?</h2>
+        <p>Você realmente deseja excluir esta postagem? Esta ação não pode ser desfeita.</p>
+
+        <div class="popupdelete-botoes">
+            <button class="popupdelete-botao-cancelar">Cancelar</button>
+            <button class="popupdelete-botao-confirmar popupdelete-cor-botao-perigo">Excluir</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Visualização -->
+<div id="modal-visualizacao" class="modal-visualizacao">
+    <div class="modal-visualizacao-conteudo">
+        <button class="fechar-modal-visualizacao">
+            <span class="material-symbols-rounded">close</span>
+        </button>
+
+        <!-- Carrossel de Mídias - Esquerda -->
+        <div class="modal-visualizacao-media">
+            <div class="carousel-container" id="carousel-container">
+                <button class="carousel-btn prev" id="carousel-prev">
+                    <span class="material-symbols-rounded">chevron_left</span>
+                </button>
+                <div class="carousel-track" id="carousel-track"></div>
+                <button class="carousel-btn next" id="carousel-next">
+                    <span class="material-symbols-rounded">chevron_right</span>
+                </button>
+                <div class="carousel-indicators" id="carousel-indicators"></div>
+            </div>
+        </div>
+
+        <!-- Informações - Direita -->
+        <div class="modal-visualizacao-info">
+            <!-- Campo invisível para armazenar o hash do post -->
+            <input type="hidden" id="post_hash" value="">
+            
+            <div class="status-section">
+                <span class="status-badge" id="view-status"></span>
+            </div>
+
+            <h2 id="view-titulo"></h2>
+            <p id="view-descricao"></p>
+
+            <div class="info-divider"></div>
+
+            <div class="info-item">
+                <span class="material-symbols-rounded">category</span>
+                <div class="info-item-content">
+                    <div class="info-item-label">Total de Mídias</div>
+                    <div class="info-item-value" id="view-media-count">0</div>
+                </div>
+            </div>
+
+            <div class="info-item">
+                <span class="material-symbols-rounded">schedule</span>
+                <div class="info-item-content">
+                    <div class="info-item-label">Criado Em</div>
+                    <div class="info-item-value">Recentemente</div>
+                </div>
+            </div>
+
+            <!-- Campo de Upload de Imagens (visível apenas no modo edição) -->
+            <div class="upload-imagens-container" id="upload-imagens-container">
+                <label for="upload-imagens-input" class="upload-imagens-label">
+                    <span class="material-symbols-rounded">add_photo_alternate</span>
+                    <span>Clique para adicionar imagens ou vídeos</span>
+                    <small style="color: #999; font-size: 0.85rem;">JPEG (max 8MB) | MP4/MOV (max 100MB)</small>
+                </label>
+                <input type="file" id="upload-imagens-input" class="upload-imagens-input"
+                       accept="image/jpeg,video/mp4,video/quicktime" multiple>
+
+                <!-- Preview das imagens adicionadas -->
+                <div class="preview-imagens-container" id="preview-imagens-container"></div>
+            </div>
+
+            <!-- Botões de Ação -->
+            <div class="modal-actions">
+                <button class="modal-btn btn-editar-modal" id="btn-editar-post">
+                    <span class="material-symbols-rounded">edit</span>
+                    Editar
+                </button>
+                <button class="modal-btn btn-excluir-modal" id="btn-excluir-post">
+                    <span class="material-symbols-rounded">delete</span>
+                    Excluir
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/static/js/sidebar.js"></script>
+<script>
+    // Dados das postagens em JavaScript (melhor prática que data-attributes)
+    const POSTAGENS_DATA = {
+        {% for postagem in postagens %}
+            "{{ postagem.codigo }}": {
+                id: "{{ postagem.codigo }}",
+                titulo: "{{ postagem.titulo }}",
+                conteudo: "{{ postagem.conteudo }}",
+                status: "{{ postagem.status }}",
+                hash: "{{ postagem.hash }}",
+                medias: [
+                    {% for media in postagem.medias %}
+                        {
+                            tipo: "{{ media.tipo }}",
+                            path: "{{ media.path }}"
+                        }{% if not loop.last %},{% endif %}
+                    {% endfor %}
+                ]
+            }{% if not loop.last %},{% endif %}
+        {% endfor %}
+    };
+
+    document.addEventListener('DOMContentLoaded', () => {
+        // === Variáveis Gerais ===
+        const modal = document.getElementById('modal-criar-postagem');
+        const form = document.getElementById('form-criar-postagem');
+        const btnFlutuante = document.getElementById('btn-flutuante');
+        const fecharModalCriar = document.getElementById('fechar-modal-criar');
+        const postagemGrid = document.querySelector('.postagem-grid');
+        const modalView = document.getElementById('modal-visualizacao');
+
+        // === Modal de Exclusão ===
+        const modalExclusaoOverlay = document.getElementById('popupdelete-overlay');
+        let postIdParaExcluir = null;
+
+        // Função executada ao confirmar a exclusão do post
+        const confirmarExclusaoPost = (postId) => {
+            fetch(`/postagem/deletar/${postId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-Token': '{{ request.session.CSRF_token }}'
+                }
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Remove o card da tela
+                        const cardParaRemover = postagemGrid.querySelector(`.postagem-card[data-post-id="${postId}"]`);
+                        if (cardParaRemover) {
+                            cardParaRemover.remove();
+                        }
+                        alert('✅ ' + (data.detail || 'Post deletado com sucesso!'));
+
+                        // Fecha o modal de exclusão
+                        fecharModalExclusao();
+                    } else {
+                        alert('❌ ' + (data.detail || 'Falha ao excluir a postagem.'));
+                    }
+                })
+                .catch(error => {
+                    alert('❌ Ocorreu um erro ao excluir a postagem');
+                });
+        };
+
+        const abrirModalExclusao = (postId) => {
+            postIdParaExcluir = postId;
+            modalExclusaoOverlay.classList.add('popupdelete-visivel');
+        };
+
+        const fecharModalExclusao = () => {
+            modalExclusaoOverlay.classList.remove('popupdelete-visivel');
+            postIdParaExcluir = null;
+        };
+
+        if (modalExclusaoOverlay) {
+            const btnConfirmarExclusao = modalExclusaoOverlay.querySelector('.popupdelete-botao-confirmar');
+            const btnCancelarExclusao = modalExclusaoOverlay.querySelector('.popupdelete-botao-cancelar');
+            const btnFecharExclusao = modalExclusaoOverlay.querySelector('.popupdelete-fechar');
+
+            btnConfirmarExclusao.addEventListener('click', () => {
+                if (postIdParaExcluir) {
+                    confirmarExclusaoPost(postIdParaExcluir);
+                } else {
+                    alert('Erro: ID da postagem não encontrado. Tente novamente.');
+                }
+            });
+
+            btnCancelarExclusao.addEventListener('click', fecharModalExclusao);
+            btnFecharExclusao.addEventListener('click', fecharModalExclusao);
+            modalExclusaoOverlay.addEventListener('click', (e) => {
+                if (e.target === modalExclusaoOverlay) fecharModalExclusao();
+            });
+        }
+
+        // === Modal de Criação ===
+        if (btnFlutuante) {
+            btnFlutuante.addEventListener('click', () => {
+                modal.classList.add('show');
+            });
+        }
+
+        if (fecharModalCriar) {
+            fecharModalCriar.addEventListener('click', () => {
+                modal.classList.remove('show');
+            });
+        }
+
+        if (modal) {
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.classList.remove('show');
+                }
+            });
+        }
+
+        // Validação do formulário
+        if (form) {
+            form.addEventListener('submit', (e) => {
+                const files = document.getElementById('files').files;
+
+                for (let file of files) {
+                    const fileType = file.type;
+                    const fileSize = file.size;
+
+                    if (fileType === 'image/jpeg' && fileSize > 8 * 1024 * 1024) {
+                        e.preventDefault();
+                        alert('❌ Imagem JPEG muito grande! Máximo: 8 MB');
+                        return;
+                    }
+
+                    if ((fileType === 'video/mp4' || fileType === 'video/quicktime') && fileSize > 100 * 1024 * 1024) {
+                        e.preventDefault();
+                        alert('❌ Vídeo muito grande! Máximo: 100 MB');
+                        return;
+                    }
+                }
+            });
+        }
+
+        // === Modal de Visualização com Carrossel ===
+        if (modalView) {
+            const fecharModalViewBtn = modalView.querySelector('.fechar-modal-visualizacao');
+            const carouselTrack = document.getElementById('carousel-track');
+            const carouselPrev = document.getElementById('carousel-prev');
+            const carouselNext = document.getElementById('carousel-next');
+            const carouselIndicators = document.getElementById('carousel-indicators');
+            const viewTitulo = document.getElementById('view-titulo');
+            const viewDescricao = document.getElementById('view-descricao');
+            const viewStatus = document.getElementById('view-status');
+            const viewMediaCount = document.getElementById('view-media-count');
+            const btnEditarPost = document.getElementById('btn-editar-post');
+            const btnExcluirPost = document.getElementById('btn-excluir-post');
+
+            let currentIndex = 0;
+            let totalSlides = 0;
+            let currentPostId = null;
+            let isEditMode = false; // Controla se está no modo edição
+            let deleted_images = []; // Lista de imagens/vídeos deletados
+            let added_images = []; // Lista de imagens/vídeos adicionados
+
+            const updateCarousel = () => {
+                carouselTrack.style.transform = `translateX(-${currentIndex * 100}%)`;
+
+                // Atualizar indicadores
+                const indicators = carouselIndicators.querySelectorAll('.carousel-indicator');
+                indicators.forEach((indicator, index) => {
+                    indicator.classList.toggle('active', index === currentIndex);
+                });
+
+                // Mostrar/ocultar botões de navegação
+                carouselPrev.style.display = totalSlides > 1 ? 'flex' : 'none';
+                carouselNext.style.display = totalSlides > 1 ? 'flex' : 'none';
+                carouselIndicators.style.display = totalSlides > 1 ? 'flex' : 'none';
+            };
+
+            carouselPrev.addEventListener('click', () => {
+                currentIndex = (currentIndex - 1 + totalSlides) % totalSlides;
+                updateCarousel();
+            });
+
+            carouselNext.addEventListener('click', () => {
+                currentIndex = (currentIndex + 1) % totalSlides;
+                updateCarousel();
+            });
+
+            const fecharModalVisualizacao = () => {
+                modalView.classList.remove('visivel');
+                const videos = carouselTrack.querySelectorAll('video');
+                videos.forEach(video => video.pause());
+                currentIndex = 0;
+                currentPostId = null;
+                isEditMode = false; // Reseta o modo edição ao fechar
+                // Resetar listas de imagens deletadas e adicionadas
+                deleted_images = [];
+                added_images = [];
+
+                // Reverter botões ao estado original (Editar/Excluir)
+                btnEditarPost.innerHTML = '<span class="material-symbols-rounded">edit</span>Editar';
+                btnEditarPost.className = 'modal-btn btn-editar-modal';
+
+                btnExcluirPost.innerHTML = '<span class="material-symbols-rounded">delete</span>Excluir';
+                btnExcluirPost.className = 'modal-btn btn-excluir-modal';
+
+                // Desabilitar edição dos campos e remover estilos
+                viewTitulo.contentEditable = false;
+                viewTitulo.style.border = 'none';
+                viewTitulo.style.padding = '';
+                viewTitulo.style.borderRadius = '';
+
+                viewDescricao.contentEditable = false;
+                viewDescricao.style.border = 'none';
+                viewDescricao.style.padding = '';
+                viewDescricao.style.borderRadius = '';
+
+                // Esconder campo de upload de imagens
+                const uploadContainer = document.getElementById('upload-imagens-container');
+                if (uploadContainer) {
+                    uploadContainer.classList.remove('ativo');
+                }
+
+                // Limpar preview de imagens
+                const previewContainer = document.getElementById('preview-imagens-container');
+                if (previewContainer) {
+                    previewContainer.innerHTML = '';
+                }
+            };
+
+            window.abrirModalVisualizacao = (postagem) => {
+                currentPostId = postagem.id;
+                viewTitulo.textContent = postagem.titulo;
+                viewDescricao.textContent = postagem.conteudo;
+
+                // Atualizar hash do post no campo invisível
+                const postHashInput = document.getElementById('post_hash');
+                if (postHashInput) {
+                    postHashInput.value = postagem.hash || '';
+                }
+
+                // Atualizar status
+                const statusClass = 'status-' + (postagem.status || 'pendente').toLowerCase().replace(' ', '-');
+                viewStatus.className = 'status-badge ' + statusClass;
+                viewStatus.textContent = postagem.status || 'Pendente';
+
+                // Limpar carrossel
+                carouselTrack.innerHTML = '';
+                carouselIndicators.innerHTML = '';
+                currentIndex = 0;
+
+                const medias = postagem.medias || [];
+
+                if (medias.length > 0) {
+                    totalSlides = medias.length;
+                    viewMediaCount.textContent = `${medias.length} mídia${medias.length > 1 ? 's' : ''}`;
+
+                    medias.forEach((media, index) => {
+                        const caminho = `/static/uploads/${media.path}`;
+
+                        // Criar slide
+                        const slide = document.createElement('div');
+                        slide.className = 'carousel-slide';
+                        slide.style.position = 'relative';
+
+                        if (media.tipo === 'video') {
+                            const video = document.createElement('video');
+                            video.src = caminho;
+                            video.controls = true;
+                            video.loop = true;
+                            slide.appendChild(video);
+                        } else {
+                            const img = document.createElement('img');
+                            img.src = caminho;
+                            img.alt = postagem.titulo;
+                            slide.appendChild(img);
+                        }
+
+                        // Adicionar botão X APENAS se estiver no modo edição
+                        if (isEditMode) {
+                            const btnRemover = document.createElement('button');
+                            btnRemover.className = 'btn-remover-media';
+                            btnRemover.innerHTML = '<span class="material-symbols-rounded">close</span>';
+                            slide.appendChild(btnRemover);
+                        }
+
+                        carouselTrack.appendChild(slide);
+
+                        // Criar indicador
+                        const indicator = document.createElement('div');
+                        indicator.className = 'carousel-indicator';
+                        if (index === 0) indicator.classList.add('active');
+                        indicator.addEventListener('click', () => {
+                            currentIndex = index;
+                            updateCarousel();
+                        });
+                        carouselIndicators.appendChild(indicator);
+                    });
+                } else {
+                    totalSlides = 1;
+                    viewMediaCount.textContent = 'Sem mídias';
+                    const slide = document.createElement('div');
+                    slide.className = 'carousel-slide';
+                    slide.innerHTML = '<p style="color: white; font-size: 1.2rem;">Sem mídia disponível</p>';
+                    carouselTrack.appendChild(slide);
+                }
+
+                updateCarousel();
+                modalView.classList.add('visivel');
+            };
+
+            // Função para ativar modo edição
+            const ativarModoEdicao = () => {
+                isEditMode = true;
+
+                // Alterar botões
+                btnEditarPost.innerHTML = '<span class="material-symbols-rounded">close</span>Cancelar';
+                btnEditarPost.className = 'modal-btn btn-cancelar-modal';
+
+                btnExcluirPost.innerHTML = '<span class="material-symbols-rounded">save</span>Salvar';
+                btnExcluirPost.className = 'modal-btn btn-salvar-modal';
+
+                // Tornar campos editáveis
+                viewTitulo.contentEditable = true;
+                viewTitulo.style.border = '2px solid #843af3';
+                viewTitulo.style.padding = '0.5rem';
+                viewTitulo.style.borderRadius = '8px';
+                viewTitulo.style.outline = 'none';
+
+                viewDescricao.contentEditable = true;
+                viewDescricao.style.border = '2px solid #843af3';
+                viewDescricao.style.padding = '0.5rem';
+                viewDescricao.style.borderRadius = '8px';
+                viewDescricao.style.outline = 'none';
+
+                // Mostrar campo de upload de imagens
+                const uploadContainer = document.getElementById('upload-imagens-container');
+                if (uploadContainer) {
+                    uploadContainer.classList.add('ativo');
+                }
+
+                // Configurar event listener para o input de upload (apenas uma vez)
+                const uploadInput = document.getElementById('upload-imagens-input');
+                const previewContainer = document.getElementById('preview-imagens-container');
+
+                // Remover event listener anterior se existir
+                uploadInput.replaceWith(uploadInput.cloneNode(true));
+                const newUploadInput = document.getElementById('upload-imagens-input');
+
+                newUploadInput.addEventListener('change', (e) => {
+                    const files = Array.from(e.target.files);
+
+                    files.forEach((file) => {
+                        // Validações
+                        const isImage = file.type === 'image/jpeg';
+                        const isVideo = file.type === 'video/mp4' || file.type === 'video/quicktime';
+
+                        if (!isImage && !isVideo) {
+                            alert(`❌ Tipo de arquivo não permitido: ${file.name}`);
+                            return;
+                        }
+
+                        if (isImage && file.size > 8 * 1024 * 1024) {
+                            alert(`❌ Imagem muito grande: ${file.name} (max 8MB)`);
+                            return;
+                        }
+
+                        if (isVideo && file.size > 100 * 1024 * 1024) {
+                            alert(`❌ Vídeo muito grande: ${file.name} (max 100MB)`);
+                            return;
+                        }
+
+                        // Adicionar ao array added_images
+                        added_images.push(file);
+
+                        // Criar preview
+                        const previewItem = document.createElement('div');
+                        previewItem.className = 'preview-imagem-item';
+
+                        const reader = new FileReader();
+                        reader.onload = (event) => {
+                            if (isVideo) {
+                                const video = document.createElement('video');
+                                video.src = event.target.result;
+                                video.muted = true;
+                                previewItem.appendChild(video);
+                            } else {
+                                const img = document.createElement('img');
+                                img.src = event.target.result;
+                                img.alt = file.name;
+                                previewItem.appendChild(img);
+                            }
+
+                            // Botão para remover preview
+                            const btnRemover = document.createElement('button');
+                            btnRemover.className = 'btn-remover-preview';
+                            btnRemover.innerHTML = '<span class="material-symbols-rounded">close</span>';
+                            btnRemover.onclick = (e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+
+                                // Remover do array
+                                const index = added_images.indexOf(file);
+                                if (index > -1) {
+                                    added_images.splice(index, 1);
+                                }
+
+                                // Remover preview visual
+                                previewItem.remove();
+                            };
+                            previewItem.appendChild(btnRemover);
+                        };
+                        reader.readAsDataURL(file);
+
+                        previewContainer.appendChild(previewItem);
+                    });
+
+                    // Limpar input para permitir adicionar o mesmo arquivo novamente
+                    e.target.value = '';
+                });
+
+                // Recria o carousel com os botões X
+                const postagem = POSTAGENS_DATA[currentPostId];
+                if (postagem) {
+                    carouselTrack.innerHTML = '';
+                    carouselIndicators.innerHTML = '';
+                    currentIndex = 0;
+
+                    const medias = postagem.medias || [];
+
+                    if (medias.length > 0) {
+                        totalSlides = medias.length;
+
+                        medias.forEach((media, index) => {
+                            const caminho = `/static/uploads/${media.path}`;
+
+                            const slide = document.createElement('div');
+                            slide.className = 'carousel-slide';
+                            slide.style.position = 'relative';
+                            slide.dataset.mediaPath = media.path; // Armazena o path da mídia
+
+                            if (media.tipo.toLowerCase() === 'video') {
+                                const video = document.createElement('video');
+                                video.src = caminho;
+                                video.controls = true;
+                                video.loop = true;
+                                slide.appendChild(video);
+                            } else {
+                                const img = document.createElement('img');
+                                img.src = caminho;
+                                img.alt = postagem.titulo;
+                                slide.appendChild(img);
+                            }
+
+                            // Adicionar botão X com funcionalidade
+                            const btnRemover = document.createElement('button');
+                            btnRemover.className = 'btn-remover-media';
+                            btnRemover.innerHTML = '<span class="material-symbols-rounded">close</span>';
+
+                            btnRemover.onclick = (e) => {
+                                e.stopPropagation();
+
+                                // Adicionar ao array de imagens deletadas
+                                const fileName = media.path.split('/').pop(); // Pega apenas o nome do arquivo com extensão
+
+                                if (!deleted_images.includes(fileName)) {
+                                    deleted_images.push(fileName);
+                                }
+
+                                // Remover o slide do carousel
+                                slide.remove();
+
+                                // Remover o indicador correspondente
+                                const indicators = carouselIndicators.querySelectorAll('.carousel-indicator');
+                                if (indicators[index]) {
+                                    indicators[index].remove();
+                                }
+
+                                // Atualizar total de slides
+                                totalSlides--;
+                                viewMediaCount.textContent = `${totalSlides} mídia${totalSlides !== 1 ? 's' : ''}`;
+
+                                // Se não houver mais slides, mostrar mensagem
+                                if (totalSlides === 0) {
+                                    viewMediaCount.textContent = 'Sem mídias';
+                                    carouselTrack.innerHTML = '<div class="carousel-slide"><p style="color: white; font-size: 1.2rem;">Sem mídia disponível</p></div>';
+                                    totalSlides = 1;
+                                } else {
+                                    // Ajustar o índice atual se necessário
+                                    if (currentIndex >= totalSlides) {
+                                        currentIndex = totalSlides - 1;
+                                    }
+                                }
+
+                                updateCarousel();
+                            };
+                            slide.appendChild(btnRemover);
+
+                            carouselTrack.appendChild(slide);
+
+                            const indicator = document.createElement('div');
+                            indicator.className = 'carousel-indicator';
+                            if (index === 0) indicator.classList.add('active');
+                            indicator.addEventListener('click', () => {
+                                currentIndex = index;
+                                updateCarousel();
+                            });
+                            carouselIndicators.appendChild(indicator);
+                        });
+                    }
+
+                    updateCarousel();
+                }
+            };
+
+            // Função para desativar modo edição (Cancelar)
+            const desativarModoEdicao = () => {
+                isEditMode = false;
+
+                // Reverter botões ao estado original
+                btnEditarPost.innerHTML = '<span class="material-symbols-rounded">edit</span>Editar';
+                btnEditarPost.className = 'modal-btn btn-editar-modal';
+
+                btnExcluirPost.innerHTML = '<span class="material-symbols-rounded">delete</span>Excluir';
+                btnExcluirPost.className = 'modal-btn btn-excluir-modal';
+
+                // Desabilitar edição dos campos e remover estilos
+                viewTitulo.contentEditable = false;
+                viewTitulo.style.border = 'none';
+                viewTitulo.style.padding = '';
+                viewTitulo.style.borderRadius = '';
+
+                viewDescricao.contentEditable = false;
+                viewDescricao.style.border = 'none';
+                viewDescricao.style.padding = '';
+                viewDescricao.style.borderRadius = '';
+
+                // Esconder campo de upload de imagens
+                const uploadContainer = document.getElementById('upload-imagens-container');
+                if (uploadContainer) {
+                    uploadContainer.classList.remove('ativo');
+                }
+
+                // Limpar preview de imagens
+                const previewContainer = document.getElementById('preview-imagens-container');
+                if (previewContainer) {
+                    previewContainer.innerHTML = '';
+                }
+
+                // Restaurar valores originais (cancelar alterações)
+                let postagem = POSTAGENS_DATA[currentPostId];
+                if (postagem) {
+                    viewTitulo.textContent = postagem.titulo;
+                    viewDescricao.textContent = postagem.conteudo;
+                }
+
+                // Recria o carousel SEM os botões X
+                postagem = POSTAGENS_DATA[currentPostId];
+                if (postagem) {
+                    carouselTrack.innerHTML = '';
+                    carouselIndicators.innerHTML = '';
+                    currentIndex = 0;
+
+                    const medias = postagem.medias || [];
+
+                    if (medias.length > 0) {
+                        totalSlides = medias.length;
+
+                        medias.forEach((media, index) => {
+                            const caminho = `/static/uploads/${media.path}`;
+
+                            const slide = document.createElement('div');
+                            slide.className = 'carousel-slide';
+                            slide.style.position = 'relative';
+
+                            if (media.tipo === 'video') {
+                                const video = document.createElement('video');
+                                video.src = caminho;
+                                video.controls = true;
+                                video.loop = true;
+                                slide.appendChild(video);
+                            } else {
+                                const img = document.createElement('img');
+                                img.src = caminho;
+                                img.alt = postagem.titulo;
+                                slide.appendChild(img);
+                            }
+
+                            // NÃO adiciona botão X aqui
+
+                            carouselTrack.appendChild(slide);
+
+                            const indicator = document.createElement('div');
+                            indicator.className = 'carousel-indicator';
+                            if (index === 0) indicator.classList.add('active');
+                            indicator.addEventListener('click', () => {
+                                currentIndex = index;
+                                updateCarousel();
+                            });
+                            carouselIndicators.appendChild(indicator);
+                        });
+                    }
+
+                    updateCarousel();
+                }
+            };
+
+            // Função para salvar edição
+            const salvarEdicao = async () => {
+                // Pegar dados originais
+                const postagemOriginal = POSTAGENS_DATA[currentPostId];
+
+                // Valores editados
+                const tituloEditado = viewTitulo.textContent.trim();
+                const conteudoEditado = viewDescricao.textContent.trim();
+
+                // Pegar hash do post do campo invisível
+                const postHashInput = document.getElementById('post_hash');
+                const postHash = postHashInput ? postHashInput.value : '';
+
+                // Criar FormData para enviar
+                const formData = new FormData();
+
+                // Adicionar hash do post (sempre)
+                if (postHash) {
+                    formData.append('post_hash', postHash);
+                }
+
+                // Adicionar título APENAS se foi modificado
+                if (tituloEditado !== postagemOriginal.titulo) {
+                    formData.append('titulo', tituloEditado);
+                }
+
+                // Adicionar conteúdo APENAS se foi modificado
+                if (conteudoEditado !== postagemOriginal.conteudo) {
+                    formData.append('conteudo', conteudoEditado);
+                }
+
+                // Adicionar imagens deletadas (cada uma separadamente para o getlist)
+                deleted_images.forEach(filename => {
+                    formData.append('deleted_media', filename);
+                });
+
+                // Adicionar novos arquivos (objetos File reais)
+                added_images.forEach(file => {
+                    formData.append('added_media', file);
+                });
+
+                // Enviar requisição PATCH para o backend
+                try {
+                    const response = await fetch(`/postagem/atualizar/${currentPostId}`, {
+                        method: 'PATCH',
+                        headers: {
+                            'X-CSRF-Token': '{{ request.session.CSRF_token }}'
+                        },
+                        body: formData
+                    });
+
+                    const resultado = await response.json();
+
+                    if (response.ok && resultado.success) {
+                        alert('✅ ' + (resultado.detail || 'Post atualizado com sucesso!'));
+                        fecharModalVisualizacao();
+                        // Recarregar página para mostrar alterações
+                        window.location.reload();
+                    } else {
+                        alert('❌ ' + (resultado.detail || 'Erro ao atualizar o post. Tente novamente.'));
+                    }
+                } catch (error) {
+                    console.error('Erro ao atualizar post:', error);
+                    alert('❌ Erro ao conectar com o servidor. Tente novamente.');
+                }
+            };
+
+            // Botões de ação - Lógica dinâmica
+            btnEditarPost.addEventListener('click', () => {
+                if (isEditMode) {
+                    // Se está no modo edição, o botão é "Cancelar"
+                    desativarModoEdicao();
+                } else {
+                    // Se não está no modo edição, o botão é "Editar"
+                    ativarModoEdicao();
+                }
+            });
+
+            btnExcluirPost.addEventListener('click', () => {
+                if (isEditMode) {
+                    // Se está no modo edição, o botão é "Salvar"
+                    salvarEdicao();
+                } else {
+                    // Se não está no modo edição, o botão é "Excluir"
+                    if (currentPostId) {
+                        const idParaDeletar = currentPostId;
+                        fecharModalVisualizacao();
+                        setTimeout(() => {
+                            abrirModalExclusao(idParaDeletar);
+                        }, 100);
+                    }
+                }
+            });
+
+            fecharModalViewBtn.addEventListener('click', fecharModalVisualizacao);
+            modalView.addEventListener('click', (e) => {
+                if (e.target === modalView) {
+                    fecharModalVisualizacao();
+                }
+            });
+        }
+
+        // === Lógica de Clique nos Cards ===
+        if (postagemGrid) {
+            postagemGrid.addEventListener('click', e => {
+                const cardVisualizavel = e.target.closest('.visualizavel');
+                if (cardVisualizavel) {
+                    const postId = cardVisualizavel.dataset.postId;
+                    const postagem = POSTAGENS_DATA[postId];
+
+                    if (!postagem) {
+                        return;
+                    }
+
+                    abrirModalVisualizacao(postagem);
+                }
+            });
+        }
+    });
+</script>
+</body>
+</html>
+

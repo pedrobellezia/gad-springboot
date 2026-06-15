@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Painel Redator</title>
+    <link rel="icon" type="image/png" sizes="16x16" href="/static/img/assets/fav_icon.png">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+          rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded" rel="stylesheet"/>
+    <link rel="stylesheet" href="/static/css/painel_gestor.css">
+    <link rel="stylesheet" href="/static/css/sidebar.css">
+    <link rel="stylesheet" href="/static/css/criacao_postagem.css">
+    <link rel="stylesheet" href="/static/css/exclusaopopup.css">
+    <link rel="stylesheet" href="/static/css/responsividade.css">
+    <link rel="stylesheet" href="/static/css/error_popup.css">
+    <style>
+        .cliente-card {
+            cursor: pointer;
+            text-decoration: none;
+            display: block;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .cliente-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+    <aside class="sidebar expanded" id="sidebar">
+        <div class="logo">
+            <img src="/static/img/assets/logo_GAD_PAINEL.png" alt="Logo" style="width: 80%; height: auto;"/>
+        </div>
+        <nav class="menu-wrapper">
+            <div class="menu">
+                <a href="/painel_redator" class="menu-item active"><span
+                        class="material-symbols-rounded">space_dashboard</span><span
+                        class="text">Postagens</span></a>
+                <a href="/redator_convite" class="menu-item"><span
+                        class="material-symbols-rounded">forward_to_inbox</span><span
+                        class="text">Convites</span></a>
+                <a href="/perfil_redator" class="menu-item"><span class="material-symbols-rounded">Person</span><span
+                        class="text">Perfil</span></a>
+                <a href="/config" class="menu-item"><span
+                        class="material-symbols-rounded">settings</span><span class="text">Configurações</span></a>
+            </div>
+            <div style="margin-top: auto; width: 100%;">
+                <a href="javascript:void(0);" id="logoutBtn" class="menu-item logout">
+                    <span class="material-symbols-rounded">exit_to_app</span>
+                    <span class="text">Sair</span>
+                </a>
+            </div>
+        </nav>
+    </aside>
+
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    <main class="main-content">
+        <header class="header">
+            <button id="toggleBtn" class="toggle-btn">
+                <span class="material-symbols-rounded" id="iconToggle">chevron_left</span>
+            </button>
+            <h1>Visão Geral</h1>
+           <div class="user-info">
+                <span id="headerUserName">Carregando...</span>
+                <img id="headerUserAvatar" src="/static/img/assets/logo_GAD_HOME.png" alt="Avatar" class="avatar">
+            </div>
+        </header>
+
+        <section class="clientes-grid" id="clientesGrid">
+            <div style="text-align: center; width: 100%; padding: 2rem;">
+                <p style="color: #666;">Carregando clientes...</p>
+            </div>
+        </section>
+    </main>
+</div>
+
+<!-- Botão Flutuante para Criar Postagem -->
+<button id="btn-flutuante" class="btn-flutuante" title="Criar Postagem" aria-label="Criar nova postagem">
+    <span class="material-symbols-rounded">add</span>
+</button>
+
+<!-- Modal para Criar Postagem -->
+<div id="modal-criar-postagem" class="modal-criar">
+    <div class="modal-criar-conteudo">
+        <button id="fechar-modal" class="fechar-modal" aria-label="Fechar" onclick="fecharModal()">&times;</button>
+        <h2>Criar Nova Postagem</h2>
+
+        <form id="form-criar-postagem">
+            <label for="id_cliente">Cliente *</label>
+            <select id="id_cliente" name="id_cliente" required>
+                <option value="">Selecione um cliente</option>
+            </select>
+
+            <label for="titulo">Título *</label>
+            <input type="text" id="titulo" name="titulo" required maxlength="150" placeholder="Título da postagem">
+
+            <label for="conteudo">Conteúdo *</label>
+            <textarea id="conteudo" name="conteudo" required rows="5" placeholder="Descreva a postagem..."></textarea>
+
+            <label for="files">Mídias (JPEG, PNG, MP4)</label>
+            <input type="file" id="files" name="files" accept="image/jpeg,image/png,video/mp4" multiple>
+            <small style="color: #666; font-size: 0.875rem; margin-top: -0.5rem; display: block; margin-bottom: 15px;">
+                📷 JPEG/PNG (max 8MB) | 🎥 MP4 (max 100MB)
+            </small>
+
+            <button type="submit" style="width: 100%; background-color: #843af3; color: white; padding: 12px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">Salvar Postagem</button>
+        </form>
+    </div>
+</div>
+
+<!-- Pop-up de Alerta Personalizado (Sucesso / Erro) -->
+<div id="popup-alerta" class="popupdelete-overlay">
+    <div class="popupdelete-conteudo">
+        <button type="button" class="popupdelete-fechar" onclick="fecharAlertaPopup()">
+            <span class="material-symbols-rounded">close</span>
+        </button>
+
+        <div id="alerta-icone" class="popupdelete-icone">
+            <span id="alerta-icone-span" class="material-symbols-rounded">check_circle</span>
+        </div>
+
+        <h2 id="alerta-titulo">Sucesso!</h2>
+        <p id="alerta-texto">Mensagem de alerta...</p>
+
+        <div class="popupdelete-botoes">
+            <button type="button" id="alerta-btn-ok" class="popupdelete-botao-confirmar" onclick="fecharAlertaPopup()" style="background-color: #843af3; color: white;">
+                OK
+            </button>
+        </div>
+    </div>
+</div>
+
+<script src="/static/js/sidebar.js"></script>
+<script>
+    const token = localStorage.getItem('token');
+    if (!token) {
+        window.location.href = '/login';
+    }
+
+    const modalCriar = document.getElementById('modal-criar-postagem');
+    const btnFlutuante = document.getElementById('btn-flutuante');
+    const formCriar = document.getElementById('form-criar-postagem');
+    const selectCliente = document.getElementById('id_cliente');
+
+    const alertaPopup = document.getElementById('popup-alerta');
+    const alertaIconeSpan = document.getElementById('alerta-icone-span');
+    const alertaIconeDiv = document.getElementById('alerta-icone');
+    const alertaTitulo = document.getElementById('alerta-titulo');
+    const alertaTexto = document.getElementById('alerta-texto');
+    const alertaBtnOk = document.getElementById('alerta-btn-ok');
+
+    function mostrarAlerta(titulo, texto, isSuccess) {
+        alertaTitulo.textContent = titulo;
+        alertaTexto.textContent = texto;
+        if (isSuccess) {
+            alertaIconeSpan.textContent = 'check_circle';
+            alertaIconeDiv.style.color = '#4ce68b';
+            alertaIconeDiv.style.borderColor = '#4ce68b';
+            alertaBtnOk.style.backgroundColor = '#843af3';
+        } else {
+            alertaIconeSpan.textContent = 'cancel';
+            alertaIconeDiv.style.color = '#ef4444';
+            alertaIconeDiv.style.borderColor = '#ef4444';
+            alertaBtnOk.style.backgroundColor = '#ef4444';
+        }
+        alertaPopup.classList.add('popupdelete-visivel');
+    }
+
+    function fecharAlertaPopup() {
+        alertaPopup.classList.remove('popupdelete-visivel');
+    }
+
+    btnFlutuante.addEventListener('click', () => {
+        modalCriar.classList.add('visivel');
+    });
+
+    function fecharModal() {
+        modalCriar.classList.remove('visivel');
+        formCriar.reset();
+    }
+
+    function getAvatarUrl(avatar) {
+        if (!avatar || avatar === 'None' || avatar === 'icon_padrao.png') {
+            return '/static/img/assets/logo_GAD_HOME.png'; 
+        }
+        if (avatar.startsWith('http://') || avatar.startsWith('https://')) {
+            return avatar;
+        }
+        return '/static/uploads/' + avatar;
+    }
+
+    let currentUser = null;
+    let myClients = [];
+
+    async function loadRedatorDashboard() {
+        try {
+            // Obter redator info
+            const meRes = await fetch('/me', {
+                headers: { 'Authorization': 'Bearer ' + token }
+            });
+            if (!meRes.ok) {
+                localStorage.removeItem('token');
+                window.location.href = '/login';
+                return;
+            }
+            currentUser = await meRes.json();
+            document.getElementById('headerUserName').textContent = currentUser.nome;
+            document.getElementById('headerUserAvatar').src = getAvatarUrl(currentUser.avatar);
+
+            // Obter empresaId do redator
+            const redatorRes = await fetch('/redatores/' + currentUser.id, {
+                headers: { 'Authorization': 'Bearer ' + token }
+            });
+            if (!redatorRes.ok) return;
+            const redatorData = await redatorRes.json();
+            const empresaId = redatorData.empresaId;
+
+            // Obter clientes da empresa
+            const clientsRes = await fetch('/cliente', {
+                headers: { 'Authorization': 'Bearer ' + token }
+            });
+
+            const grid = document.getElementById('clientesGrid');
+            grid.innerHTML = '';
+
+            if (clientsRes.ok) {
+                const allClients = await clientsRes.json();
+                myClients = allClients.filter(c => c.empresaId === empresaId);
+
+                // Populate clients dropdown in modal
+                selectCliente.innerHTML = '<option value="">Selecione um cliente</option>';
+                myClients.forEach(c => {
+                    const option = document.createElement('option');
+                    option.value = c.usuarioId;
+                    option.textContent = c.usuario ? c.usuario.nome : 'Cliente Sem Nome';
+                    selectCliente.appendChild(option);
+                });
+
+                if (myClients.length === 0) {
+                    grid.innerHTML = `
+                        <div style="display: flex; flex-direction: column; align-items: center; text-align: center; width: 100%; padding: 3rem 2rem;">
+                            <img src="/static/img/assets/sem_cliente_feedback.png" alt="Sem clientes" style="width: 200px; opacity: 0.8; margin-bottom: 1rem;"/>
+                            <h3 style="color: #333; margin-bottom: 0.5rem;">Nenhum cliente vinculado</h3>
+                            <p style="font-size: 1.1rem; color: #666; margin-bottom: 2rem; max-width: 400px; line-height: 1.5;">
+                                Envie um código de convite para seu cliente se cadastrar e aparecer aqui.
+                            </p>
+                            <a href="/redator_convite" style="background-color: #843af3; color: white; text-decoration: none; font-weight: 600; padding: 12px 30px; border-radius: 50px; display: inline-flex; align-items: center; gap: 8px;">
+                                <span class="material-symbols-rounded">forward_to_inbox</span>
+                                Ver Convites Disponíveis
+                            </a>
+                        </div>
+                    `;
+                    return;
+                }
+
+                myClients.forEach(c => {
+                    const name = c.usuario ? c.usuario.nome : 'Cliente Sem Nome';
+                    const card = document.createElement('a');
+                    card.className = 'cliente-card';
+                    card.href = `/postagens_cliente?clienteId=${c.usuarioId}`;
+                    card.innerHTML = `
+                        <h3>Cliente: ${name}</h3>
+                    `;
+                    grid.appendChild(card);
+                });
+            } else {
+                grid.innerHTML = '<p style="color: red; text-align: center; width:100%">Erro ao carregar clientes.</p>';
+            }
+
+        } catch (err) {
+            console.error(err);
+            document.getElementById('clientesGrid').innerHTML = '<p style="color: red; text-align: center; width:100%">Erro de conexão com o servidor.</p>';
+        }
+    }
+
+    // Criar postagem
+    formCriar.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const clienteId = document.getElementById('id_cliente').value;
+        const titulo = document.getElementById('titulo').value;
+        const conteudo = document.getElementById('conteudo').value;
+        const fileInput = document.getElementById('files');
+
+        // Combina título e conteúdo
+        const fullConteudo = titulo + '\n\n' + conteudo;
+
+        // Hash aleatório para a postagem
+        const hash = 'post_' + Math.random().toString(36).substring(2, 11) + '_' + Date.now();
+
+        try {
+            // 1. Upload das mídias sequencialmente
+            const uploadedFilenames = [];
+            for (let i = 0; i < fileInput.files.length; i++) {
+                const file = fileInput.files[i];
+                const formData = new FormData();
+                formData.append('file', file);
+
+                const uploadRes = await fetch('/upload', {
+                    method: 'POST',
+                    headers: { 'Authorization': 'Bearer ' + token },
+                    body: formData
+                });
+
+                if (uploadRes.ok) {
+                    const uploadResult = await uploadRes.json();
+                    const isVideo = file.type.startsWith('video/');
+                    uploadedFilenames.push({
+                        filename: uploadResult.filename,
+                        tipo: isVideo ? 'VIDEO' : 'IMAGEM'
+                    });
+                } else {
+                    mostrarAlerta('Erro!', `Falha no upload do arquivo ${file.name}`, false);
+                    return;
+                }
+            }
+
+            // 2. Criar a Postagem
+            const postRes = await fetch('/posts', {
+                method: 'POST',
+                headers: {
+                    'Authorization': 'Bearer ' + token,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    clienteId,
+                    redatorId: currentUser.id,
+                    conteudo: fullConteudo,
+                    status: 'RASCUNHO',
+                    hash
+                })
+            });
+
+            if (!postRes.ok) {
+                mostrarAlerta('Erro!', 'Erro ao criar postagem no banco de dados.', false);
+                return;
+            }
+
+            // Obter o ID do post criado a partir do cabeçalho Location
+            const locationHeader = postRes.headers.get('Location');
+            if (!locationHeader) {
+                mostrarAlerta('Erro!', 'Erro: não foi possível resgatar o ID da nova postagem.', false);
+                return;
+            }
+            const postId = locationHeader.split('/').pop();
+
+            // 3. Vincular mídias ao post
+            for (let media of uploadedFilenames) {
+                const mediaRes = await fetch('/post-media', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': 'Bearer ' + token,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        url: media.filename,
+                        tipo: media.tipo,
+                        postId
+                    })
+                });
+
+                if (!mediaRes.ok) {
+                    console.error('Falha ao associar mídia:', media.filename);
+                }
+            }
+
+            mostrarAlerta('Sucesso!', 'Postagem criada com sucesso.', true);
+            fecharModal();
+            loadRedatorDashboard();
+
+        } catch (err) {
+            console.error('Erro na criação de postagem:', err);
+            mostrarAlerta('Erro!', 'Ocorreu um erro ao criar a postagem.', false);
+        }
+    });
+
+    // Logout
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        window.location.href = '/login';
+    });
+
+    loadRedatorDashboard();
+</script>
+</body>
+
+</html>

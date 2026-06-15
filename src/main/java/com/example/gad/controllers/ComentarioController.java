@@ -40,7 +40,7 @@ public class ComentarioController {
     }
 
     @PostMapping
-    @PreAuthorize("hasRole('ADMIN') or (hasRole('CLIENTE') and @postService.findById(#objDto.postId).getCliente().getUsuario().getEmail() == authentication.name) or (hasRole('REDATOR') and @postService.findById(#objDto.postId).getRedator().getUsuario().getEmail() == authentication.name)")
+    @PreAuthorize("hasRole('ADMIN') or @securityService.canCommentOnPost(#objDto.postId, authentication)")
     public ResponseEntity<Void> create(@Valid @RequestBody ComentarioCreateDTO objDto) {
 
         Comentario obj = comentarioService.fromCreateDTO(objDto);
@@ -65,7 +65,7 @@ public class ComentarioController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN') or @comentarioService.findById(#id).getUsuario().getEmail() == authentication.name")
+    @PreAuthorize("hasRole('ADMIN') or @securityService.isOwnerOfComentario(#id, authentication)")
     public ResponseEntity<Void> delete(@PathVariable UUID id) {
 
         comentarioService.delete(id);

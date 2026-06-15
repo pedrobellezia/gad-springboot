@@ -17,6 +17,8 @@ import com.example.gad.models.PostStatus;
 import com.example.gad.models.dto.PostCreateDTO;
 import com.example.gad.models.dto.PostUpdateDTO;
 import com.example.gad.models.projection.PostProjection;
+import com.example.gad.models.projection.PostMediaProjection;
+import com.example.gad.models.projection.ComentarioProjection;
 import com.example.gad.services.ComentarioService;
 import com.example.gad.services.PostMediaService;
 import com.example.gad.services.PostService;
@@ -48,25 +50,25 @@ public class PostController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('REDATOR') or @postService.findById(#id).getCliente().getUsuario().getEmail() == authentication.name")
+    @PreAuthorize("@securityService.canAccessPost(#id, authentication)")
     public ResponseEntity<Post> findById(@PathVariable UUID id) {
         return ResponseEntity.ok(postService.findById(id));
     }
 
     @GetMapping("/{id}/medias")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('REDATOR') or @postService.findById(#id).getCliente().getUsuario().getEmail() == authentication.name")
-    public ResponseEntity<List<PostMedia>> findAllMediasByPostId(@PathVariable UUID id) {
+    @PreAuthorize("@securityService.canAccessPost(#id, authentication)")
+    public ResponseEntity<List<PostMediaProjection>> findAllMediasByPostId(@PathVariable UUID id) {
         return ResponseEntity.ok(postMediaService.findAllByPostId(id));
     }
 
     @GetMapping("/{id}/comentarios")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('REDATOR') or @postService.findById(#id).getCliente().getUsuario().getEmail() == authentication.name")
-    public ResponseEntity<List<Comentario>> findAllComentariosByPostId(@PathVariable UUID id) {
+    @PreAuthorize("@securityService.canAccessPost(#id, authentication)")
+    public ResponseEntity<List<ComentarioProjection>> findAllComentariosByPostId(@PathVariable UUID id) {
         return ResponseEntity.ok(comentarioService.findAllByPostId(id));
     }
 
     @PostMapping
-    @PreAuthorize("hasRole('ADMIN') or hasRole('REDATOR')")
+    @PreAuthorize("hasRole('ADMIN') or @securityService.canAccessCliente(#dto.clienteId, authentication)")
     public ResponseEntity<Void> create(@Valid @RequestBody PostCreateDTO dto) {
 
         Post created = postService.create(postService.fromCreateDTO(dto));
@@ -81,7 +83,7 @@ public class PostController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('REDATOR')")
+    @PreAuthorize("hasRole('ADMIN') or @securityService.canAccessPost(#id, authentication)")
     public ResponseEntity<Void> update(@Valid @RequestBody PostUpdateDTO dto, @PathVariable UUID id) {
 
         dto.setId(id);
@@ -91,7 +93,7 @@ public class PostController {
     }
 
     @PutMapping("/{id}/status")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('REDATOR') or @postService.findById(#id).getCliente().getUsuario().getEmail() == authentication.name")
+    @PreAuthorize("@securityService.canAccessPost(#id, authentication)")
     public ResponseEntity<Void> updateStatus(
             @PathVariable UUID id,
             @RequestBody PostStatusRequest body
@@ -101,7 +103,7 @@ public class PostController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('REDATOR')")
+    @PreAuthorize("hasRole('ADMIN') or @securityService.canAccessPost(#id, authentication)")
     public ResponseEntity<Void> delete(@PathVariable UUID id) {
         postService.delete(id);
         return ResponseEntity.noContent().build();

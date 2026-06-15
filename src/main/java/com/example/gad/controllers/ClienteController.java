@@ -33,7 +33,7 @@ public class ClienteController {
     private final PostService postService;
 
     @GetMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('REDATOR')")
     public ResponseEntity<List<ClienteProjection>> findAll() {
 
         return ResponseEntity.ok(
@@ -42,7 +42,7 @@ public class ClienteController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN') or @clienteService.findById(#id).getUsuario().getEmail() == authentication.name")
+    @PreAuthorize("@securityService.canAccessCliente(#id, authentication)")
     public ResponseEntity<Cliente> findById(
             @PathVariable UUID id
     ) {
@@ -53,7 +53,7 @@ public class ClienteController {
     }
 
     @GetMapping("/{id}/posts")
-    @PreAuthorize("hasRole('ADMIN') or @clienteService.findById(#id).getUsuario().getEmail() == authentication.name")
+    @PreAuthorize("@securityService.canAccessCliente(#id, authentication)")
     public ResponseEntity<List<PostProjection>> findAllPostsByClienteId(
             @PathVariable UUID id
     ) {
@@ -83,7 +83,7 @@ public class ClienteController {
     }
     // ADMIN
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN') or @clienteService.findById(#id).getUsuario().getEmail() == authentication.name")
+    @PreAuthorize("@securityService.canAccessCliente(#id, authentication)")
     public ResponseEntity<Cliente> update(
             @Valid @RequestBody ClienteUpdateDTO dto,
             @PathVariable UUID id
